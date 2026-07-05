@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+/* অ্যানিমেশন কি-ফ্রেম */
+@keyframes marquee {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+/* 100s ডিউরেশন দিলে অ্যানিমেশনটি অনেক বেশি স্লো এবং প্রফেশনাল হবে */
+.animate-marquee {
+  animation: marquee 100s linear infinite;
+}
