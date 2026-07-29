@@ -6,23 +6,36 @@ import Hero from "../components/Hero";
 import About from "../components/About";
 import Services from "../components/Services";
 import Projects from "../components/Projects";
-import AuthSection from "../components/AuthSection";
+import Pricing from "../components/Pricing";
+import Blog from "../components/Blog";
+import Contact from "../components/Contact"; // Contact কম্পোনেন্ট ইম্পোর্ট
+import ServiceRequestModal from "../components/ServiceRequestModal";
 
 export default function Home() {
-  const [isAuthVisible, setIsAuthVisible] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedPlan, setSelectedPlan] = useState("");
+
+  const handleOpenForm = (planName) => {
+    setSelectedPlan(planName);
+    setIsModalOpen(true);
+  };
 
   return (
     <main className="bg-zinc-950 min-h-screen">
       <Navbar />
-      <Hero onShowAuth={() => setIsAuthVisible(true)} />
+      <Hero />
       <About />
       <Services />
-        <Projects />
-      
-      {/* এটি এখন সব সময় DOM এ থাকবে, কিন্তু আমরা visibility কন্ট্রোল করছি */}
-      <div className={isAuthVisible ? "block" : "hidden"}>
-        <AuthSection />
-      </div>
+      <Projects />
+      <Pricing onOpenForm={handleOpenForm} />
+      <Blog />
+      <Contact /> {/* এখানে কন্টাক্ট সেকশন যুক্ত করা হলো */}
+
+      <ServiceRequestModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedPlan={selectedPlan}
+      />
     </main>
   );
 }
