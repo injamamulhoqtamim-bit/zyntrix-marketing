@@ -2,66 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function Hero() {
+export default function Hero({ onShowAuth }) {
   const videos = ["/hero.mp4", "/hero2.mp4", "/hero3.mp4"];
-
   const [currentVideo, setCurrentVideo] = useState(0);
+  const [isPopupOpen, setIsPopupOpen] = useState(true); // পপআপ স্টেট
   const videoRef = useRef(null);
-
-  const popupData = [
-    {
-      title: "🚀 Do You Learn Digital Marketing?",
-      link: "https://YOUR_DIGITAL_MARKETING_LINK.com",
-    },
-    {
-      title: "🔐 Do You Learn Ethical Hacking?",
-      link: "https://YOUR_ETHICAL_HACKING_LINK.com",
-    },
-  ];
-
-  const [showPopup, setShowPopup] = useState(false);
-  const [popupIndex, setPopupIndex] = useState(0);
-
-  // পপআপ ক্লোজ করার ফাংশন
-  const handleClosePopup = () => {
-    setShowPopup(false);
-    localStorage.setItem("popupClosed", "true"); // লোকাল স্টোরেজে সেভ করা হলো
-  };
 
   const handleVideoEnd = () => {
     setCurrentVideo((prev) => (prev + 1) % videos.length);
   };
-
-  useEffect(() => {
-    // যদি আগে থেকেই ক্লোজ করা থাকে, তবে আর পপআপ দেখাবে না
-    if (localStorage.getItem("popupClosed") === "true") return;
-
-    let startTimer;
-    let hideTimer;
-    let nextTimer;
-
-    const runPopup = (index) => {
-      setPopupIndex(index);
-      setShowPopup(true);
-
-      hideTimer = setTimeout(() => {
-        setShowPopup(false);
-        nextTimer = setTimeout(() => {
-          runPopup((index + 1) % popupData.length);
-        }, 2000);
-      }, 10000); 
-    };
-
-    startTimer = setTimeout(() => {
-      runPopup(0);
-    }, 3000);
-
-    return () => {
-      clearTimeout(startTimer);
-      clearTimeout(hideTimer);
-      clearTimeout(nextTimer);
-    };
-  }, []);
 
   return (
     <section className="relative min-h-screen overflow-hidden flex items-center justify-center pt-20">
@@ -82,33 +31,32 @@ export default function Hero() {
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/60"></div>
 
-      {/* Popup */}
-      {showPopup && (
-        <div className="fixed bottom-8 right-8 z-50">
-          <div className="relative w-[320px] rounded-2xl bg-white shadow-2xl overflow-hidden">
-            <button
-              onClick={handleClosePopup} // এখানে আপডেট করা হয়েছে
-              className="absolute top-2 right-3 text-gray-500 hover:text-red-500 text-xl font-bold"
-            >
-              ✕
-            </button>
-            <a
-              href={popupData[popupIndex].link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block p-6"
-            >
-              <h2 className="text-xl font-bold text-gray-900">
-                {popupData[popupIndex].title}
-              </h2>
-              <p className="mt-3 text-gray-600">
-                Click here to explore our professional course.
-              </p>
-              <button className="mt-5 w-full rounded-lg bg-blue-600 py-3 text-white font-semibold hover:bg-blue-700 transition">
-                Learn More →
-              </button>
-            </a>
-          </div>
+      {/* Popup Message */}
+      {isPopupOpen && (
+        <div className="fixed bottom-10 right-10 z-50 bg-zinc-900 border border-blue-500/50 p-6 rounded-2xl shadow-2xl max-w-sm animate-in slide-in-from-bottom-10 fade-in duration-500">
+          <button
+            onClick={() => setIsPopupOpen(false)}
+            className="absolute top-2 right-2 text-zinc-400 hover:text-white"
+          >
+            ✕
+          </button>
+          <h3 className="text-white font-bold text-lg mb-4">
+            ডিজিটাল মার্কেটিং ও সাইবার সিকিউরিটি শিখতে চান?
+          </h3>
+          <button
+            onClick={() => {
+              setIsPopupOpen(false); // পপআপ বন্ধ হবে
+              onShowAuth(); // AuthSection দৃশ্যমান করবে
+              
+              // সেকশনটি DOM এ আসার পর স্মুথ স্ক্রল করার জন্য সামান্য দেরি দিচ্ছি
+              setTimeout(() => {
+                document.getElementById('learning-section')?.scrollIntoView({ behavior: 'smooth' });
+              }, 100);
+            }}
+            className="block w-full py-2 text-center bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+          >
+            Click Here
+          </button>
         </div>
       )}
 
