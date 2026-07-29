@@ -49,7 +49,7 @@ export default function FloatingContact() {
           <div className="flex flex-col gap-3 transition-all duration-500 transform scale-100 opacity-100 animate-in fade-in slide-in-from-bottom-5 mb-1">
             {/* Email */}
             <a
-              href="mailto:support@zyntrixlab.com"
+              href="mailto:zyntrix.lab.official@gmail.com"
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-red-500 via-rose-500 to-pink-600 hover:scale-110 text-white flex items-center justify-center shadow-lg shadow-red-500/40 transition-all duration-300 hover:rotate-6"
               aria-label="Email"
               title="Send Email"
@@ -59,7 +59,7 @@ export default function FloatingContact() {
 
             {/* Facebook */}
             <a
-              href="https://facebook.com"
+              href="https://www.facebook.com/profile.php?id=61588044801657"
               target="_blank"
               rel="noopener noreferrer"
               className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-500 to-sky-400 hover:scale-110 text-white flex items-center justify-center shadow-lg shadow-blue-500/40 transition-all duration-300 hover:-rotate-6"
