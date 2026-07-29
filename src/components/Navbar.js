@@ -36,7 +36,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 w-full z-50 bg-zinc-950/90 backdrop-blur-md border-b border-zinc-900">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 sm:h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <span className="text-lg sm:text-xl font-black tracking-wider text-white">
               ZYNTRIX<span className="text-blue-500">LAB</span>
@@ -44,10 +44,10 @@ export default function Navbar() {
           </div>
 
           {/* Desktop Menu */}
-          <ul className="hidden md:flex items-center gap-6">
+          <ul className="hidden md:flex items-center gap-5 lg:gap-6">
             {menuItems.map((item, index) => (
               <li key={index}>
-                <a href={item.href} className="text-zinc-400 hover:text-white font-medium text-sm transition-colors">
+                <a href={item.href} className="text-zinc-400 hover:text-white font-medium text-xs lg:text-sm transition-colors">
                   {item.name}
                 </a>
               </li>
@@ -55,7 +55,7 @@ export default function Navbar() {
           </ul>
 
           <div className="hidden md:block">
-            <a href="#contact" className="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-blue-600/30">
+            <a href="#contact" className="bg-blue-600 hover:bg-blue-700 text-white text-xs lg:text-sm font-semibold px-4 lg:px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-blue-600/30">
               Request Service
             </a>
           </div>
@@ -64,7 +64,7 @@ export default function Navbar() {
           <div className="md:hidden flex items-center">
             <button 
               onClick={() => setIsOpen(true)}
-              className="text-zinc-300 hover:text-white p-2 rounded-xl bg-zinc-900 border border-zinc-800 transition-colors shadow-sm"
+              className="text-zinc-300 hover:text-white p-2 rounded-xl bg-zinc-900 border border-zinc-800 transition-colors shadow-sm cursor-pointer"
               aria-label="Open Menu"
             >
               <Menu size={22} />
@@ -72,13 +72,13 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* চলমান রানিং টেক্সট বার */}
+        {/* চলমান রানিং টেক্সট বার (Marquee) */}
         <div className="w-full bg-blue-600 border-b border-blue-500/20 overflow-hidden">
-          <div className="animate-marquee whitespace-nowrap inline-block py-2.5 sm:py-3 text-white text-xs sm:text-sm font-bold uppercase tracking-wider">
+          <div className="animate-marquee whitespace-nowrap inline-block py-2 sm:py-2.5 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider">
             {[...Array(2)].map((_, i) => (
               <span key={i} className="inline-flex items-center gap-6 px-4">
                 {marqueeItems.map((item, idx) => (
-                  <span key={idx} className="flex items-center gap-2">
+                  <span key={idx} className="inline-flex items-center gap-2">
                     {item.icon} <span>{item.text}</span>
                     <span className="ml-6 opacity-50">•</span>
                   </span>
@@ -94,7 +94,7 @@ export default function Navbar() {
         <div 
           className="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 transition-opacity"
           onClick={() => setIsOpen(false)}
-        ></div>
+        />
       )}
 
       {/* Left Slide Sidebar (Drawer) for Mobile */}
@@ -107,7 +107,7 @@ export default function Navbar() {
             </span>
             <button 
               onClick={() => setIsOpen(false)}
-              className="text-zinc-400 hover:text-white p-2 rounded-lg bg-zinc-900 border border-zinc-800 transition-colors"
+              className="text-zinc-400 hover:text-white p-2 rounded-lg bg-zinc-900 border border-zinc-800 transition-colors cursor-pointer"
               aria-label="Close Menu"
             >
               <X size={18} />
@@ -115,7 +115,7 @@ export default function Navbar() {
           </div>
 
           {/* Sidebar Menu Items */}
-          <ul className="flex flex-col p-5 space-y-3 overflow-y-auto max-h-[calc(100vh-180px)]">
+          <ul className="flex flex-col p-5 space-y-2 sm:space-y-3 overflow-y-auto max-h-[calc(100vh-180px)]">
             {menuItems.map((item, index) => (
               <li key={index}>
                 <a 
@@ -135,7 +135,7 @@ export default function Navbar() {
           <a 
             href="#contact" 
             onClick={() => setIsOpen(false)}
-            className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30"
+            className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30 text-center"
           >
             Request Service
           </a>

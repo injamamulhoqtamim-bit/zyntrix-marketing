@@ -52,30 +52,32 @@ const blogPosts = [
 
 export default function Blog() {
   return (
-    <section className="py-20 bg-slate-950 text-white relative overflow-hidden">
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[300px] bg-blue-600/10 blur-[120px] rounded-full pointer-events-none" />
+    <section className="py-16 sm:py-24 bg-slate-950 text-white relative overflow-hidden">
+      {/* Background Glow Effect - মোবাইলে ওভারফ্লো রোধ করতে সাইজ অ্যাডজাস্ট করা হয়েছে */}
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] sm:w-[600px] h-[200px] sm:h-[300px] bg-blue-600/10 blur-[90px] sm:blur-[120px] rounded-full pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Centered Section Header */}
-        <div className="flex flex-col items-center text-center mb-16">
-          <span className="inline-block px-3.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full mb-3">
+        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
+          <span className="inline-block px-3.5 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full mb-3">
             Latest Insights
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
             Explore Our <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">Latest Blogs</span>
           </h2>
-          <p className="mt-4 text-slate-400 text-base sm:text-lg max-w-2xl">
+          <p className="mt-3 sm:mt-4 text-slate-400 text-sm sm:text-lg max-w-2xl px-2">
             Stay updated with the latest industry trends, tech guides, and growth strategies curated by the Zyntrix Lab team.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* Blog Cards Grid - মোবাইলে ১ কলাম, ট্যাবলেটে ২ কলাম এবং বড় স্ক্রিনে ৩ কলাম */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {blogPosts.map((post) => (
             <article
               key={post.id}
               className="flex flex-col bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-slate-700 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group"
             >
-              <div className="relative h-52 w-full overflow-hidden bg-slate-800">
+              <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-800">
                 <Image
                   src={post.image}
                   alt={post.title}
@@ -84,35 +86,35 @@ export default function Blog() {
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   unoptimized
                 />
-                <div className="absolute top-4 left-4 z-10">
-                  <span className="px-3 py-1 text-xs font-semibold bg-slate-950/80 backdrop-blur-md text-blue-400 border border-slate-700/50 rounded-md">
+                <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-10">
+                  <span className="px-2.5 sm:px-3 py-1 text-[10px] sm:text-xs font-semibold bg-slate-950/80 backdrop-blur-md text-blue-400 border border-slate-700/50 rounded-md">
                     {post.category}
                   </span>
                 </div>
               </div>
 
-              <div className="flex flex-col flex-1 p-6">
-                <div className="flex items-center text-xs text-slate-400 gap-3 mb-3">
+              <div className="flex flex-col flex-1 p-5 sm:p-6">
+                <div className="flex items-center text-[11px] sm:text-xs text-slate-400 gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
                   <span>{post.date}</span>
                   <span>•</span>
                   <span>{post.readTime}</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
+                <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
                   <Link href={`/blog/${post.slug}`}>
                     {post.title}
                   </Link>
                 </h3>
 
-                <p className="mt-3 text-sm text-slate-400 line-clamp-3 leading-relaxed flex-1">
+                <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-slate-400 line-clamp-3 leading-relaxed flex-1">
                   {post.excerpt}
                 </p>
 
-                <div className="my-5 border-t border-slate-800/80" />
+                <div className="my-4 sm:my-5 border-t border-slate-800/80" />
 
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden border border-slate-700">
+                  <div className="flex items-center space-x-2.5 sm:space-x-3">
+                    <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-slate-700 flex-shrink-0">
                       <Image
                         src={post.author.avatar}
                         alt={post.author.name}
@@ -122,14 +124,14 @@ export default function Blog() {
                       />
                     </div>
                     <div>
-                      <p className="text-xs font-semibold text-slate-200">{post.author.name}</p>
-                      <p className="text-[10px] text-slate-400">{post.author.role}</p>
+                      <p className="text-[11px] sm:text-xs font-semibold text-slate-200 line-clamp-1">{post.author.name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 line-clamp-1">{post.author.role}</p>
                     </div>
                   </div>
 
                   <Link
                     href={`/blog/${post.slug}`}
-                    className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 group/btn"
+                    className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 group/btn flex-shrink-0"
                   >
                     Read
                     <svg
@@ -147,11 +149,11 @@ export default function Blog() {
           ))}
         </div>
 
-        {/* View All Articles Button Centered at Bottom */}
-        <div className="mt-12 flex justify-center">
+        {/* View All Articles Button Centered at Bottom - মোবাইলে ফুল উইথ বা সঠিক প্যাডিং নিশ্চিত করা হয়েছে */}
+        <div className="mt-10 sm:mt-12 flex justify-center">
           <Link
             href="/blog"
-            className="inline-flex items-center justify-center px-8 py-3 text-sm font-semibold text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 hover:border-slate-700 transition-all duration-300 group shadow-lg"
+            className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 sm:py-3 text-sm font-semibold text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 hover:border-slate-700 transition-all duration-300 group shadow-lg text-center"
           >
             View All Articles
             <svg

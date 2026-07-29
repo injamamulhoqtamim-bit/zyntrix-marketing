@@ -18,18 +18,18 @@ export default function Services() {
   };
 
   return (
-    <section id="services" className="py-24 bg-zinc-900 text-white">
-      <div className="max-w-6xl mx-auto px-6 text-center">
-        <h2 className="text-blue-500 font-semibold uppercase tracking-widest mb-4">Our Services</h2>
-        <h1 className="text-4xl md:text-5xl font-black mb-12">High-Quality Services For You</h1>
+    <section id="services" className="py-16 sm:py-24 bg-zinc-900 text-white">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 text-center">
+        <h2 className="text-blue-500 font-semibold uppercase tracking-widest mb-3 sm:mb-4 text-sm sm:text-base">Our Services</h2>
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 sm:mb-12">High-Quality Services For You</h1>
 
-        {/* নতুন স্টাইলিশ বাটন মেনু */}
-        <div className="flex flex-wrap justify-center gap-3 mb-16">
+        {/* নতুন স্টাইলিশ বাটন মেনু - মোবাইলে সুন্দরভাবে ফিট হওয়ার জন্য রেসপন্সিভ গ্যাপিং ও প্যাডিং */}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-16">
           {Object.keys(serviceData).map((cat) => (
             <button 
               key={cat} 
               onClick={() => setActiveCategory(cat)}
-              className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 border ${
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-medium text-xs sm:text-sm transition-all duration-300 border cursor-pointer ${
                 activeCategory === cat 
                   ? "bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-900/20" 
                   : "bg-zinc-800 border-zinc-700 text-gray-300 hover:bg-zinc-700 hover:text-white"
@@ -40,16 +40,16 @@ export default function Services() {
           ))}
         </div>
 
-        {/* Sub-services List */}
-        <div className="max-w-4xl mx-auto bg-zinc-950 p-10 rounded-3xl border border-zinc-800 text-left">
-          <h3 className="text-2xl font-bold text-blue-500 mb-6 border-b border-zinc-800 pb-4">{activeCategory}</h3>
-          <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Sub-services List - মোবাইলে প্যাডিং ও লেআউট রেসপন্সিভ করা হয়েছে */}
+        <div className="max-w-4xl mx-auto bg-zinc-950 p-5 sm:p-10 rounded-2xl sm:rounded-3xl border border-zinc-800 text-left shadow-2xl">
+          <h3 className="text-xl sm:text-2xl font-bold text-blue-500 mb-5 sm:mb-6 border-b border-zinc-800 pb-3 sm:pb-4">{activeCategory}</h3>
+          <ul className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
             {serviceData[activeCategory].map((item, idx) => (
-              <li key={idx} className="flex items-center gap-3 text-gray-300 hover:text-blue-400 transition">
-                <div className="min-w-[20px]">
+              <li key={idx} className="flex items-start sm:items-center gap-3 text-gray-300 hover:text-blue-400 transition text-sm sm:text-base">
+                <div className="min-w-[20px] mt-0.5 sm:mt-0">
                    <Check size={18} className="text-blue-500" />
                 </div>
-                {item}
+                <span className="leading-snug">{item}</span>
               </li>
             ))}
           </ul>
