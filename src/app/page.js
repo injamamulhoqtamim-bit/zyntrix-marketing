@@ -12,6 +12,7 @@ import Blog from "../components/Blog";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import ServiceRequestModal from "../components/ServiceRequestModal";
+import FloatingContact from "../components/FloatingContact"; // ফ্লোটিং কন্টাক্ট ইমপোর্ট করা হলো
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,7 +35,7 @@ export default function Home() {
   };
 
   return (
-    <main className="bg-zinc-950 min-h-screen text-white">
+    <main className="bg-zinc-950 min-h-screen text-white relative">
       <Navbar />
       <Hero />
       
@@ -65,6 +66,9 @@ export default function Home() {
       </div>
 
       <Footer />
+
+      {/* ডান পাশে নিচে ভাসমান কন্টাক্ট আইকনগুলো */}
+      <FloatingContact />
 
       <ServiceRequestModal
         isOpen={isModalOpen}
