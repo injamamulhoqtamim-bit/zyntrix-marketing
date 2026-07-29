@@ -10,6 +10,7 @@ import Projects from "../components/Projects";
 import Pricing from "../components/Pricing";
 import Blog from "../components/Blog";
 import Contact from "../components/Contact"; // Contact কম্পোনেন্ট ইম্পোর্ট
+import Footer from "../components/Footer"; // Footer কম্পোনেন্ট ইম্পোর্ট
 import ServiceRequestModal from "../components/ServiceRequestModal";
 
 export default function Home() {
@@ -40,6 +41,7 @@ export default function Home() {
       <Pricing onOpenForm={handleOpenForm} />
       <Blog />
       <Contact />
+      <Footer /> {/* ফুটার সেকশন যুক্ত করা হলো */}
 
       <ServiceRequestModal
         isOpen={isModalOpen}
