@@ -4,6 +4,7 @@ import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import About from "../components/About";
+import Team from "../components/Team"; // Team কম্পোনেন্ট ইম্পোর্ট
 import Services from "../components/Services";
 import Projects from "../components/Projects";
 import Pricing from "../components/Pricing";
@@ -14,6 +15,7 @@ import ServiceRequestModal from "../components/ServiceRequestModal";
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
+  const [showTeam, setShowTeam] = useState(false); // টিম সেকশন দেখানোর জন্য স্টেট
 
   const handleOpenForm = (planName) => {
     setSelectedPlan(planName);
@@ -24,12 +26,20 @@ export default function Home() {
     <main className="bg-zinc-950 min-h-screen">
       <Navbar />
       <Hero />
-      <About />
+      
+      {/* About সেকশনে প্রপস হিসেবে অন-ক্লিক ফাংশন পাস করা হলো */}
+      <About onShowTeam={() => setShowTeam(true)} />
+
+      {/* Team সেকশনটি শুধুমাত্র showTeam ট্রু (true) হলে শো করবে */}
+      {showTeam && (
+        <Team onClose={() => setShowTeam(false)} />
+      )}
+
       <Services />
       <Projects />
       <Pricing onOpenForm={handleOpenForm} />
       <Blog />
-      <Contact /> {/* এখানে কন্টাক্ট সেকশন যুক্ত করা হলো */}
+      <Contact />
 
       <ServiceRequestModal
         isOpen={isModalOpen}

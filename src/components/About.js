@@ -1,4 +1,6 @@
-export default function About() {
+import React from 'react';
+
+export default function About({ onShowTeam }) {
   return (
     <section id="about" className="py-24 bg-zinc-950 text-white">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-16 items-center">
@@ -7,7 +9,7 @@ export default function About() {
         <div className="relative">
           <div className="absolute inset-0 bg-blue-600 rounded-3xl rotate-3 opacity-20"></div>
           <img 
-            src="/about.jpg" // আপনার প্রজেক্টের ইমেজ পাথ এখানে দিন
+            src="/about.jpg" 
             alt="About Zyntrix Lab" 
             className="relative rounded-3xl shadow-2xl w-full h-[500px] object-cover"
           />
@@ -29,7 +31,7 @@ export default function About() {
             thrive in the digital era.
           </p>
 
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 gap-6 mb-8">
             <div className="p-4 border border-zinc-800 rounded-xl bg-zinc-900/50">
               <h3 className="font-bold text-lg text-white">Innovation</h3>
               <p className="text-sm text-zinc-500">Modern approach</p>
@@ -39,6 +41,17 @@ export default function About() {
               <p className="text-sm text-zinc-500">Quality first</p>
             </div>
           </div>
+
+          {/* See Team Information Button */}
+          <div>
+            <button 
+              onClick={onShowTeam}
+              className="inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-300 bg-blue-600 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-600/30 cursor-pointer"
+            >
+              See Team Information
+            </button>
+          </div>
+
         </div>
       </div>
     </section>
