@@ -9,7 +9,7 @@ const teamMembers = [
     image: '/member1.png',
     education: [
       'B.Sc. in Computer Science & Engineering',
-      'MERN Stack Professional Certification',
+      'MERN Stack Developer Professional Certification',
     ],
     skills: ['HTML', 'CSS', 'JavaScript', 'BetterAuth', 'React', 'Next.js', 'Node.js', 'Tailwind CSS','MongoDB','Express.js','DaisyUI','Git', 'GitHub','Digital Marketing', 'UI/UX'],
     experience: [
