@@ -1,47 +1,70 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import About from "../components/About";
-import Team from "../components/Team"; // Team কম্পোনেন্ট ইম্পোর্ট
+import Team from "../components/Team";
 import Services from "../components/Services";
 import Projects from "../components/Projects";
 import Pricing from "../components/Pricing";
 import Blog from "../components/Blog";
-import Contact from "../components/Contact"; // Contact কম্পোনেন্ট ইম্পোর্ট
-import Footer from "../components/Footer"; // Footer কম্পোনেন্ট ইম্পোর্ট
+import Contact from "../components/Contact";
+import Footer from "../components/Footer";
 import ServiceRequestModal from "../components/ServiceRequestModal";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
-  const [showTeam, setShowTeam] = useState(false); // টিম সেকশন দেখানোর জন্য স্টেট
+  const [showTeam, setShowTeam] = useState(false); // টিম সেকশন দেখানোর স্টেট
+
+  const teamRef = useRef(null);
 
   const handleOpenForm = (planName) => {
     setSelectedPlan(planName);
     setIsModalOpen(true);
   };
 
+  // About থেকে ক্লিক করলে টিম দেখাবে এবং সেখানে স্ক্রোল করবে
+  const handleShowTeam = () => {
+    setShowTeam(true);
+    setTimeout(() => {
+      teamRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100);
+  };
+
   return (
-    <main className="bg-zinc-950 min-h-screen">
+    <main className="bg-zinc-950 min-h-screen text-white">
       <Navbar />
       <Hero />
       
-      {/* About সেকশনে প্রপস হিসেবে অন-ক্লিক ফাংশন পাস করা হলো */}
-      <About onShowTeam={() => setShowTeam(true)} />
+      {/* About সেকশনে ফাংশনটি প্রপস আকারে পাস করা হলো */}
+      <About onShowTeam={handleShowTeam} />
 
-      {/* Team সেকশনটি শুধুমাত্র showTeam ট্রু (true) হলে শো করবে */}
+      {/* showTeam ট্রু (true) হলে তবেই Team সেকশনটি রেন্ডার হবে */}
       {showTeam && (
-        <Team onClose={() => setShowTeam(false)} />
+        <div ref={teamRef} id="team">
+          <Team />
+        </div>
       )}
 
       <Services />
       <Projects />
       <Pricing onOpenForm={handleOpenForm} />
-      <Blog />
-      <Contact />
-      <Footer /> {/* ফুটার সেকশন যুক্ত করা হলো */}
+      
+      <div id="blog">
+        <Blog />
+      </div>
+
+      <div id="support">
+        <Contact />
+      </div>
+
+      <div id="contact">
+        <Contact />
+      </div>
+
+      <Footer />
 
       <ServiceRequestModal
         isOpen={isModalOpen}
