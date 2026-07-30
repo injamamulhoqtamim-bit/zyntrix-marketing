@@ -2,11 +2,14 @@
 import { useState, useEffect } from "react";
 import { FaFacebookF, FaEnvelope, FaTimes, FaCommentDots, FaArrowUp } from "react-icons/fa";
 
-export default function FloatingContact() {
+export default function FloatingContact({ lang = "en" }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
-  // পেজ স্ক্রোল করলে চেক করবে যে নিচে নামা হয়েছে কি না
+  // ভাষার ওপর ভিত্তি করে লেবেল পরিবর্তন
+  const contactText = lang === "bn" ? "যোগাযোগ করুন" : "Contact Us";
+
+  // পেজ স্ক্রোল করলে চেক করবে যে নিচে নামা হয়েছে কি না
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 300) {
@@ -30,7 +33,7 @@ export default function FloatingContact() {
 
   return (
     <>
-      {/* ১. বাম পাশের নিচে প্রিমিয়াম স্ক্রোল টু টপ বাটন (রেস্পন্সিভ সাইজ ও পজিশন) */}
+      {/* ১. বাম পাশের নিচে প্রিমিয়াম স্ক্রোল টু টপ বাটন */}
       {showScrollTop && (
         <button
           onClick={scrollToTop}
@@ -41,10 +44,10 @@ export default function FloatingContact() {
         </button>
       )}
 
-      {/* ২. ডান পাশের নিচে প্রিমিয়াম কন্টাক্ট উইজেট */}
+      {/* ২. ডান পাশের নিচে প্রিমিয়াম কন্টাক্ট উইজেট */}
       <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 flex flex-col items-end gap-3">
         
-        {/* সাব-আইকনগুলো (স্মুথ পপ-আপ ও স্কেল অ্যানিমেশন সহ) */}
+        {/* সাব-আইকনগুলো */}
         {isOpen && (
           <div className="flex flex-col gap-3 transition-all duration-500 transform scale-100 opacity-100 animate-in fade-in slide-in-from-bottom-5 mb-1">
             {/* Email */}
@@ -71,16 +74,16 @@ export default function FloatingContact() {
           </div>
         )}
 
-        {/* মেইন কন্টেইনার যাতে টুলটিপ এবং বাটন একসাথে থাকে */}
+        {/* মেইন কন্টেইনার */}
         <div className="flex items-center gap-3">
-          {/* "Contact Us" টুলটিপ বা লেবেল (মোবাইল স্ক্রিনে ছোট বা হাইড করা যেতে পারে চাইলে) */}
+          {/* ডায়নামিক লেবেল */}
           {!isOpen && (
             <div className="hidden sm:block bg-zinc-900/90 border border-zinc-800 text-white text-xs font-medium px-3.5 py-2 rounded-xl shadow-xl backdrop-blur-md animate-pulse">
-              Contact Us
+              {contactText}
             </div>
           )}
 
-          {/* অত্যন্ত প্রিমিয়াম এবং গ্লোয়িং মেইন টগল বাটন */}
+          {/* অত্যন্ত প্রিমিয়াম এবং গ্লোয়িং মেইন টগল বাটন */}
           <button
             onClick={() => setIsOpen(!isOpen)}
             className="relative w-13 h-13 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-blue-600 via-indigo-600 to-purple-600 text-white flex items-center justify-center shadow-2xl shadow-indigo-600/50 hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-white/20 group overflow-hidden"

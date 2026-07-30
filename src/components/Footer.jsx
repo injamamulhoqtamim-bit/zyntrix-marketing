@@ -2,7 +2,68 @@ import React from 'react';
 import Link from 'next/link';
 import { FaFacebookF, FaTwitter, FaLinkedinIn, FaInstagram, FaGithub } from 'react-icons/fa';
 
-export default function Footer() {
+const footerData = {
+  en: {
+    description: "We bridge the gap between complex technology and user-centric design to help businesses thrive in the digital era with high-quality solutions.",
+    quickLinksTitle: "Quick Links",
+    quickLinks: [
+      { name: "About Us", href: "#about" },
+      { name: "Our Team", href: "#team" },
+      { name: "Services", href: "#services" },
+      { name: "Projects", href: "#projects" },
+      { name: "Blog", href: "#blog" },
+    ],
+    servicesTitle: "Services",
+    services: [
+      { name: "Web Development", href: "#services" },
+      { name: "UI/UX Design", href: "#services" },
+      { name: "Digital Marketing", href: "#services" },
+      { name: "Cyber Security", href: "#services" },
+      { name: "Strategy & Consulting", href: "#services" },
+    ],
+    contactTitle: "Get in Touch",
+    contactDesc: "Have a project in mind? Let's build something awesome together.",
+    contactBtn: "Contact Us",
+    rights: "All rights reserved.",
+    policies: [
+      { name: "Privacy Policy", href: "#" },
+      { name: "Terms of Service", href: "#" },
+      { name: "Cookie Policy", href: "#" },
+    ],
+  },
+  bn: {
+    description: "ডিজিটাল যুগে উচ্চমানের সলিউশনের মাধ্যমে ব্যবসা সফল করতে আমরা জটিল প্রযুক্তি এবং ইউজার-সেন্ট্রিক ডিজাইনের মধ্যে সেতুবন্ধন তৈরি করি।",
+    quickLinksTitle: "দ্রুত লিংক",
+    quickLinks: [
+      { name: "আমাদের সম্পর্কে", href: "#about" },
+      { name: "আমাদের টিম", href: "#team" },
+      { name: "সেবাসমূহ", href: "#services" },
+      { name: "প্রজেক্টসমূহ", href: "#projects" },
+      { name: "ব্লগ", href: "#blog" },
+    ],
+    servicesTitle: "সেবাসমূহ",
+    services: [
+      { name: "ওয়েব ডেভেলপমেন্ট", href: "#services" },
+      { name: "ইউআই/ইউএক্স ডিজাইন", href: "#services" },
+      { name: "ডিজিটাল মার্কেটিং", href: "#services" },
+      { name: "সাইবার সিকিউরিটি", href: "#services" },
+      { name: "স্ট্র্যাটেজি ও কনসাল্টিং", href: "#services" },
+    ],
+    contactTitle: "যোগাযোগ করুন",
+    contactDesc: "কোনো প্রজেক্ট নিয়ে ভাবছেন? চলুন একসাথে দারুণ কিছু তৈরি করি।",
+    contactBtn: "যোগাযোগ করুন",
+    rights: "সর্বস্বত্ব সংরক্ষিত।",
+    policies: [
+      { name: "গোপনীয়তা নীতি", href: "#" },
+      { name: "সেবার শর্তাবলী", href: "#" },
+      { name: "কুকি নীতি", href: "#" },
+    ],
+  },
+};
+
+export default function Footer({ lang = "en" }) {
+  const t = footerData[lang] || footerData.en;
+
   return (
     <footer className="relative bg-[#09090b] text-white pt-16 sm:pt-24 pb-8 sm:pb-12 overflow-hidden border-t border-zinc-800/60">
       
@@ -17,13 +78,13 @@ export default function Footer() {
         {/* Top Grid Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-8 sm:gap-12 mb-12 sm:mb-16">
           
-          {/* Brand Info (Takes 2 columns on large screens) */}
+          {/* Brand Info */}
           <div className="lg:col-span-2 space-y-4 sm:space-y-5 text-center sm:text-left">
             <Link href="/" className="inline-block text-xl sm:text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400">
               Zyntrix Lab
             </Link>
             <p className="text-zinc-400 text-xs sm:text-sm leading-relaxed max-w-sm mx-auto sm:mx-0">
-              We bridge the gap between complex technology and user-centric design to help businesses thrive in the digital era with high-quality solutions.
+              {t.description}
             </p>
             {/* Social Links */}
             <div className="flex items-center justify-center sm:justify-start gap-3 pt-2">
@@ -47,37 +108,33 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="text-center sm:text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">Quick Links</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">{t.quickLinksTitle}</h4>
             <ul className="space-y-2.5 sm:space-y-3 text-sm text-zinc-400">
-              <li><a href="#about" className="hover:text-blue-400 transition-colors">About Us</a></li>
-              <li><a href="#team" className="hover:text-blue-400 transition-colors">Our Team</a></li>
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">Services</a></li>
-              <li><a href="#projects" className="hover:text-blue-400 transition-colors">Projects</a></li>
-              <li><a href="#blog" className="hover:text-blue-400 transition-colors">Blog</a></li>
+              {t.quickLinks.map((link, index) => (
+                <li key={index}><a href={link.href} className="hover:text-blue-400 transition-colors">{link.name}</a></li>
+              ))}
             </ul>
           </div>
 
           {/* Services */}
           <div className="text-center sm:text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">Services</h4>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">{t.servicesTitle}</h4>
             <ul className="space-y-2.5 sm:space-y-3 text-sm text-zinc-400">
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">Web Development</a></li>
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">UI/UX Design</a></li>
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">Digital Marketing</a></li>
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">Cyber Security</a></li>
-              <li><a href="#services" className="hover:text-blue-400 transition-colors">Strategy & Consulting</a></li>
+              {t.services.map((service, index) => (
+                <li key={index}><a href={service.href} className="hover:text-blue-400 transition-colors">{service.name}</a></li>
+              ))}
             </ul>
           </div>
 
-          {/* Contact / Newsletter info */}
+          {/* Contact / Get in Touch */}
           <div className="text-center sm:text-left">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">Get in Touch</h4>
-            <p className="text-xs text-zinc-400 mb-4 leading-relaxed max-w-xs mx-auto sm:mx-0">Have a project in mind? Let's build something awesome together.</p>
+            <h4 className="text-xs font-bold uppercase tracking-wider text-zinc-200 mb-4 sm:mb-5 border-l-2 border-blue-500 pl-2.5 inline-block sm:block">{t.contactTitle}</h4>
+            <p className="text-xs text-zinc-400 mb-4 leading-relaxed max-w-xs mx-auto sm:mx-0">{t.contactDesc}</p>
             <a 
               href="#contact" 
               className="inline-flex items-center justify-center w-full px-4 py-3 text-xs font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl hover:from-blue-500 hover:to-indigo-500 transition-all duration-300 shadow-xl shadow-blue-600/30 border border-blue-400/20 text-center"
             >
-              Contact Us
+              {t.contactBtn}
             </a>
           </div>
 
@@ -85,11 +142,11 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-6 sm:pt-8 border-t border-zinc-900 flex flex-col sm:flex-row items-center justify-between text-xs text-zinc-500 gap-4 text-center sm:text-left">
-          <p>© {new Date().getFullYear()} Zyntrix Lab. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} Zyntrix Lab. {t.rights}</p>
           <div className="flex flex-wrap justify-center gap-4 sm:gap-6">
-            <a href="#" className="hover:text-zinc-300 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-zinc-300 transition-colors">Cookie Policy</a>
+            {t.policies.map((policy, index) => (
+              <a key={index} href={policy.href} className="hover:text-zinc-300 transition-colors">{policy.name}</a>
+            ))}
           </div>
         </div>
 

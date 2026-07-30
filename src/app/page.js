@@ -12,12 +12,20 @@ import Blog from "../components/Blog";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
 import ServiceRequestModal from "../components/ServiceRequestModal";
-import FloatingContact from "../components/FloatingContact"; // ফ্লোটিং কন্টাক্ট ইমপোর্ট করা হলো
+import FloatingContact from "../components/FloatingContact";
 
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState("");
-  const [showTeam, setShowTeam] = useState(false); // টিম সেকশন দেখানোর স্টেট
+  const [showTeam, setShowTeam] = useState(false);
+  
+  // ভাষা পরিবর্তনের মূল স্টেট (ডিফল্ট: ইংরেজি 'en')
+  const [lang, setLang] = useState("en");
+
+  // ভাষা টগল করার ফাংশন
+  const toggleLanguage = () => {
+    setLang((prev) => (prev === "en" ? "bn" : "en"));
+  };
 
   const teamRef = useRef(null);
 
@@ -36,42 +44,53 @@ export default function Home() {
 
   return (
     <main className="bg-zinc-950 min-h-screen text-white relative">
-      <Navbar />
-      <Hero />
-      
-      {/* About সেকশনে ফাংশনটি প্রপস আকারে পাস করা হলো */}
-      <About onShowTeam={handleShowTeam} />
+      {/* Navbar */}
+      <Navbar lang={lang} toggleLanguage={toggleLanguage} />
 
-      {/* showTeam ট্রু (true) হলে তবেই Team সেকশনটি রেন্ডার হবে */}
+      {/* Hero Section */}
+      <Hero lang={lang} />
+      
+      {/* About Section */}
+      <About lang={lang} onShowTeam={handleShowTeam} />
+
+      {/* Team Section */}
       {showTeam && (
         <div ref={teamRef} id="team">
-          <Team />
+          <Team lang={lang} />
         </div>
       )}
 
-      <Services />
-      <Projects />
-      <Pricing onOpenForm={handleOpenForm} />
+      {/* Services Section */}
+      <Services lang={lang} />
+
+      {/* Projects Section */}
+      <Projects lang={lang} />
+
+      {/* Pricing Section */}
+      <Pricing lang={lang} onOpenForm={handleOpenForm} />
       
+      {/* Blog Section */}
       <div id="blog">
-        <Blog />
+        <Blog lang={lang} />
       </div>
 
+      {/* Contact / Support Section */}
       <div id="support">
-        <Contact />
+        <Contact lang={lang} />
       </div>
 
-      
+      {/* Footer */}
+      <Footer lang={lang} />
 
-      <Footer />
+      {/* Floating Contact */}
+      <FloatingContact lang={lang} />
 
-      {/* ডান পাশে নিচে ভাসমান কন্টাক্ট আইকনগুলো */}
-      <FloatingContact />
-
+      {/* Service Request Modal */}
       <ServiceRequestModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         selectedPlan={selectedPlan}
+        lang={lang}
       />
     </main>
   );

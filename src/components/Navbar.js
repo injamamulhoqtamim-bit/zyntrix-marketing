@@ -1,37 +1,69 @@
 "use client";
 import { useState } from "react";
-import { Rocket, Globe, Palette, TrendingUp, Zap, Smartphone, Search, Award, Briefcase, ShieldCheck, Megaphone, ShoppingCart, Target, Menu, X } from "lucide-react";
+import { Rocket, Globe, Palette, TrendingUp, Zap, Smartphone, Search, Award, Briefcase, ShieldCheck, Megaphone, ShoppingCart, Target, Menu, X, Languages } from "lucide-react";
 
-export default function Navbar() {
+// page.js থেকে lang এবং toggleLanguage প্রপসগুলো রিসিভ করা হলো
+export default function Navbar({ lang, toggleLanguage }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  const menuItems = [
-    { name: "Home", href: "#" },
-    { name: "About", href: "#about" },
-    { name: "Services", href: "#services" },
-    { name: "Projects", href: "#projects" },
-    
-    { name: "Blog", href: "#blog" },
-    { name: "Support", href: "#support" },
-    { name: "Contact", href: "#contact" },
-  ];
+  // মেনু আইটেমগুলোর ইংরেজি ও বাংলা রূপ
+  const menuItems = {
+    en: [
+      { name: "Home", href: "#" },
+      { name: "About", href: "#about" },
+      { name: "Services", href: "#services" },
+      { name: "Projects", href: "#projects" },
+      { name: "Blog", href: "#blog" },
+      { name: "Support", href: "#support" },
+      { name: "Contact", href: "#contact" },
+    ],
+    bn: [
+      { name: "হোম", href: "#" },
+      { name: "আমাদের সম্পর্কে", href: "#about" },
+      { name: "সেবাসমূহ", href: "#services" },
+      { name: "প্রজেক্টসমূহ", href: "#projects" },
+      { name: "ব্লগ", href: "#blog" },
+      { name: "সাপোর্ট", href: "#support" },
+      { name: "যোগাযোগ", href: "#contact" },
+    ],
+  };
 
-  // আইটেমগুলো এবং তাদের আইকন
-  const marqueeItems = [
-    { icon: <Rocket size={16} />, text: "WELCOME TO ZYNTRIX LAB" },
-    { icon: <Globe size={16} />, text: "MODERN WEB SOLUTIONS" },
-    { icon: <Palette size={16} />, text: "UI/UX DESIGN" },
-    { icon: <TrendingUp size={16} />, text: "DIGITAL MARKETING" },
-    { icon: <Zap size={16} />, text: "FAST & SECURE WEBSITE" },
-    { icon: <Smartphone size={16} />, text: "MOBILE APP DESIGN" },
-    { icon: <Search size={16} />, text: "SEO OPTIMIZATION" },
-    { icon: <Award size={16} />, text: "100% CLIENT SATISFACTION" },
-    { icon: <Briefcase size={16} />, text: "BUSINESS BRANDING" },
-    { icon: <ShieldCheck size={16} />, text: "CYBER SECURITY" },
-    { icon: <Megaphone size={16} />, text: "SOCIAL MEDIA MARKETING" },
-    { icon: <ShoppingCart size={16} />, text: "E-COMMERCE SOLUTIONS" },
-    { icon: <Target size={16} />, text: "LET'S BUILD YOUR EMPIRE" },
-  ];
+  // রানিং টেক্সট বা মারকি আইটেমগুলোর ইংরেজি ও বাংলা রূপ
+  const marqueeItems = {
+    en: [
+      { icon: <Rocket size={16} />, text: "WELCOME TO ZYNTRIX LAB" },
+      { icon: <Globe size={16} />, text: "MODERN WEB SOLUTIONS" },
+      { icon: <Palette size={16} />, text: "UI/UX DESIGN" },
+      { icon: <TrendingUp size={16} />, text: "DIGITAL MARKETING" },
+      { icon: <Zap size={16} />, text: "FAST & SECURE WEBSITE" },
+      { icon: <Smartphone size={16} />, text: "MOBILE APP DESIGN" },
+      { icon: <Search size={16} />, text: "SEO OPTIMIZATION" },
+      { icon: <Award size={16} />, text: "100% CLIENT SATISFACTION" },
+      { icon: <Briefcase size={16} />, text: "BUSINESS BRANDING" },
+      { icon: <ShieldCheck size={16} />, text: "CYBER SECURITY" },
+      { icon: <Megaphone size={16} />, text: "SOCIAL MEDIA MARKETING" },
+      { icon: <ShoppingCart size={16} />, text: "E-COMMERCE SOLUTIONS" },
+      { icon: <Target size={16} />, text: "LET'S BUILD YOUR EMPIRE" },
+    ],
+    bn: [
+      { icon: <Rocket size={16} />, text: "জাইন্ট্রিক্স ল্যাবে স্বাগতম" },
+      { icon: <Globe size={16} />, text: "মডার্ন ওয়েব সলিউশন" },
+      { icon: <Palette size={16} />, text: "ইউআই/ইউএক্স ডিজাইন" },
+      { icon: <TrendingUp size={16} />, text: "ডিজিটাল মার্কেটিং" },
+      { icon: <Zap size={16} />, text: "ফাস্ট ও সিকিউর ওয়েবসাইট" },
+      { icon: <Smartphone size={16} />, text: "মোবাইল অ্যাপ ডিজাইন" },
+      { icon: <Search size={16} />, text: "এসইও অপ্টিমাইজেশন" },
+      { icon: <Award size={16} />, text: "১০০% ক্লায়েন্ট সন্তুষ্টি" },
+      { icon: <Briefcase size={16} />, text: "বিজনেস ব্র্যান্ডিং" },
+      { icon: <ShieldCheck size={16} />, text: "সাইবার সিকিউরিটি" },
+      { icon: <Megaphone size={16} />, text: "সোশ্যাল মিডিয়া মার্কেটিং" },
+      { icon: <ShoppingCart size={16} />, text: "ই-কমার্স সলিউশন" },
+      { icon: <Target size={16} />, text: "আসুন আপনার ডিজিটাল সাম্রাজ্য গড়ে তুলি" },
+    ],
+  };
+
+  const currentMenu = menuItems[lang] || menuItems.en;
+  const currentMarquee = marqueeItems[lang] || marqueeItems.en;
 
   return (
     <>
@@ -45,7 +77,7 @@ export default function Navbar() {
 
           {/* Desktop Menu */}
           <ul className="hidden md:flex items-center gap-5 lg:gap-6">
-            {menuItems.map((item, index) => (
+            {currentMenu.map((item, index) => (
               <li key={index}>
                 <a href={item.href} className="text-zinc-400 hover:text-white font-medium text-xs lg:text-sm transition-colors">
                   {item.name}
@@ -54,14 +86,33 @@ export default function Navbar() {
             ))}
           </ul>
 
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-3">
+            {/* Language Toggle Button (Desktop) */}
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer"
+              aria-label="Toggle Language"
+            >
+              <Languages size={15} className="text-blue-500" />
+              <span>{lang === "en" ? "বাংলা" : "English"}</span>
+            </button>
+
             <a href="#contact" className="bg-blue-600 hover:bg-blue-700 text-white text-xs lg:text-sm font-semibold px-4 lg:px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-blue-600/30">
-              Request Service
+              {lang === "en" ? "Request Service" : "সেবা নিন"}
             </a>
           </div>
 
           {/* Mobile Menu Toggle Button */}
-          <div className="md:hidden flex items-center">
+          <div className="md:hidden flex items-center gap-2">
+            <button
+              onClick={toggleLanguage}
+              className="flex items-center gap-1 bg-zinc-900 text-zinc-300 border border-zinc-800 text-xs font-semibold px-2.5 py-2 rounded-xl transition-colors cursor-pointer"
+              aria-label="Toggle Language"
+            >
+              <Languages size={14} className="text-blue-500" />
+              <span>{lang === "en" ? "বাংলা" : "EN"}</span>
+            </button>
+
             <button 
               onClick={() => setIsOpen(true)}
               className="text-zinc-300 hover:text-white p-2 rounded-xl bg-zinc-900 border border-zinc-800 transition-colors shadow-sm cursor-pointer"
@@ -77,7 +128,7 @@ export default function Navbar() {
           <div className="animate-marquee whitespace-nowrap inline-block py-2 sm:py-2.5 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider">
             {[...Array(2)].map((_, i) => (
               <span key={i} className="inline-flex items-center gap-6 px-4">
-                {marqueeItems.map((item, idx) => (
+                {currentMarquee.map((item, idx) => (
                   <span key={idx} className="inline-flex items-center gap-2">
                     {item.icon} <span>{item.text}</span>
                     <span className="ml-6 opacity-50">•</span>
@@ -116,7 +167,7 @@ export default function Navbar() {
 
           {/* Sidebar Menu Items */}
           <ul className="flex flex-col p-5 space-y-2 sm:space-y-3 overflow-y-auto max-h-[calc(100vh-180px)]">
-            {menuItems.map((item, index) => (
+            {currentMenu.map((item, index) => (
               <li key={index}>
                 <a 
                   href={item.href} 
@@ -137,7 +188,7 @@ export default function Navbar() {
             onClick={() => setIsOpen(false)}
             className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30 text-center"
           >
-            Request Service
+            {lang === "en" ? "Request Service" : "সেবা নিন"}
           </a>
         </div>
       </div>
