@@ -1,7 +1,8 @@
 import React from 'react';
+import { Users, ArrowRight } from "lucide-react";
 
 export default function About({ lang = "en", onShowTeam }) {
-  // ভাষা অনুযায়ী টেক্সট কনটেন্ট
+  // ভাষা অনুযায়ী টেক্সট কনটেন্ট
   const content = {
     en: {
       badge: "About Us",
@@ -12,18 +13,20 @@ export default function About({ lang = "en", onShowTeam }) {
       card1Sub: "Modern approach",
       card2Title: "Excellence",
       card2Sub: "Quality first",
-      btnText: "Click here to know more about our team",
+      btnText: "Meet Our Expert Team",
+      btnSub: "Click to explore brilliance",
     },
     bn: {
       badge: "আমাদের সম্পর্কে",
       titlePart1: "আমরা নিবেদিত",
       titleHighlight: "আপনার সাফল্যে।",
-      description: "জাইন্ট্রিক্স ল্যাব হলো আবেগপ্রবণ ডেভেলপার, ডিজাইনার এবং মার্কেটারদের একটি দল, যারা উচ্চমানের ডিজিটাল সলিউশন তৈরি করতে প্রতিশ্রুতিবদ্ধ। আধুনিক ব্যবসার প্রসারে আমরা জটিল প্রযুক্তি এবং ব্যবহারকারী-কেন্দ্রিক ডিজাইনের মধ্যকার দূরত্ব কমিয়ে আনি।",
+      description: "জাইন্ট্রিক্স ল্যাব হলো আবেগপ্রবণ ডেভেলপার, ডিজাইনার এবং মার্কেটারদের একটি দল, যারা উচ্চমানের ডিজিটাল সলিউশন তৈরি করতে প্রতিশ্রুতিবদ্ধ। আধুনিক ব্যবসার প্রসারে আমরা জটিল প্রযুক্তি এবং ব্যবহারকারী-কেন্দ্রিক ডিজাইনের মধ্যকার দূরত্ব কমিয়ে আনি।",
       card1Title: "উদ্ভাবন",
       card1Sub: "আধুনিক দৃষ্টিভঙ্গি",
       card2Title: "উৎকর্ষতা",
       card2Sub: "গুণগত মান সবার আগে",
-      btnText: "আমাদের টিম সম্পর্কে আরও জানতে এখানে ক্লিক করুন",
+      btnText: "আমাদের এক্সপার্ট টিম দেখুন",
+      btnSub: "এক ক্লিকে ঘুরে আসুন",
     },
   };
 
@@ -71,13 +74,33 @@ export default function About({ lang = "en", onShowTeam }) {
             </div>
           </div>
 
-          {/* See Team Information Button */}
+          {/* Ultra Premium Animated Team Button */}
           <div>
             <button 
               onClick={onShowTeam}
-              className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-300 bg-blue-600 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-600/30 cursor-pointer text-sm sm:text-base text-center"
+              className="group relative inline-flex items-center gap-3 w-full sm:w-auto px-8 py-4 font-bold text-white transition-all duration-300 bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 rounded-2xl hover:scale-[1.03] active:scale-95 shadow-xl shadow-blue-600/30 hover:shadow-blue-500/50 cursor-pointer overflow-hidden border border-blue-400/30"
             >
-              {t.btnText}
+              {/* Shimmer / Glowing Light Beam Effect */}
+              <span className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent via-white/30 to-transparent group-hover:animate-shine" />
+
+              {/* Pulsing Background Ring */}
+              <span className="absolute inset-0 rounded-2xl bg-blue-400/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500"></span>
+
+              {/* Icon Container with pop effect */}
+              <span className="relative z-10 flex items-center justify-center w-10 h-10 bg-white/10 rounded-xl border border-white/20 group-hover:rotate-12 transition-transform duration-300">
+                <Users size={20} className="text-blue-200 group-hover:text-white transition-colors" />
+              </span>
+
+              {/* Text Layout */}
+              <span className="relative z-10 flex flex-col text-left">
+                <span className="text-sm sm:text-base tracking-wide font-extrabold">{t.btnText}</span>
+                <span className="text-[11px] text-blue-200 font-medium tracking-wider">{t.btnSub}</span>
+              </span>
+
+              {/* Arrow Icon with Slide Animation */}
+              <span className="relative z-10 ml-auto sm:ml-4 transform group-hover:translate-x-1.5 transition-transform duration-300">
+                <ArrowRight size={18} className="text-white" />
+              </span>
             </button>
           </div>
 
