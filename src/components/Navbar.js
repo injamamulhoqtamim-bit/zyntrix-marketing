@@ -2,11 +2,9 @@
 import { useState } from "react";
 import { Rocket, Globe, Palette, TrendingUp, Zap, Smartphone, Search, Award, Briefcase, ShieldCheck, Megaphone, ShoppingCart, Target, Menu, X, Languages } from "lucide-react";
 
-// page.js থেকে lang এবং toggleLanguage প্রপসগুলো রিসিভ করা হলো
 export default function Navbar({ lang, toggleLanguage }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  // মেনু আইটেমগুলোর ইংরেজি ও বাংলা রূপ
   const menuItems = {
     en: [
       { name: "Home", href: "#" },
@@ -28,10 +26,10 @@ export default function Navbar({ lang, toggleLanguage }) {
     ],
   };
 
-  // রানিং টেক্সট বা মারকি আইটেমগুলোর ইংরেজি ও বাংলা রূপ
   const marqueeItems = {
     en: [
       { icon: <Rocket size={16} />, text: "WELCOME TO ZYNTRIX LAB" },
+      { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কিটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
       { icon: <Globe size={16} />, text: "MODERN WEB SOLUTIONS" },
       { icon: <Palette size={16} />, text: "UI/UX DESIGN" },
       { icon: <TrendingUp size={16} />, text: "DIGITAL MARKETING" },
@@ -47,6 +45,7 @@ export default function Navbar({ lang, toggleLanguage }) {
     ],
     bn: [
       { icon: <Rocket size={16} />, text: "জাইন্ট্রিক্স ল্যাবে স্বাগতম" },
+      { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কিটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
       { icon: <Globe size={16} />, text: "মডার্ন ওয়েব সলিউশন" },
       { icon: <Palette size={16} />, text: "ইউআই/ইউএক্স ডিজাইন" },
       { icon: <TrendingUp size={16} />, text: "ডিজিটাল মার্কেটিং" },
@@ -87,7 +86,6 @@ export default function Navbar({ lang, toggleLanguage }) {
           </ul>
 
           <div className="hidden md:flex items-center gap-3">
-            {/* Language Toggle Button (Desktop) */}
             <button
               onClick={toggleLanguage}
               className="flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-zinc-800 text-xs font-semibold px-3 py-2 rounded-lg transition-all cursor-pointer"
@@ -123,19 +121,27 @@ export default function Navbar({ lang, toggleLanguage }) {
           </div>
         </div>
 
-        {/* চলমান রানিং টেক্সট বার (Marquee) */}
-        <div className="w-full bg-blue-600 border-b border-blue-500/20 overflow-hidden">
-          <div className="animate-marquee whitespace-nowrap inline-block py-2 sm:py-2.5 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider">
-            {[...Array(2)].map((_, i) => (
-              <span key={i} className="inline-flex items-center gap-6 px-4">
-                {currentMarquee.map((item, idx) => (
-                  <span key={idx} className="inline-flex items-center gap-2">
-                    {item.icon} <span>{item.text}</span>
-                    <span className="ml-6 opacity-50">•</span>
-                  </span>
-                ))}
-              </span>
-            ))}
+        {/* চিরপ্রবহমান মারকি বার (Seamless Continuous Marquee) */}
+        <div className="w-full bg-blue-600 border-b border-blue-500/20 overflow-hidden relative flex">
+          <div className="flex animate-marquee whitespace-nowrap py-2 sm:py-2.5 text-white text-[11px] sm:text-xs font-bold uppercase tracking-wider">
+            {/* প্রথম সেট */}
+            <div className="flex items-center shrink-0">
+              {currentMarquee.map((item, idx) => (
+                <span key={`1-${idx}`} className="inline-flex items-center gap-2 px-4">
+                  {item.icon} <span>{item.text}</span>
+                  <span className="ml-4 opacity-50">•</span>
+                </span>
+              ))}
+            </div>
+            {/* দ্বিতীয় সেট (seamless লুপ বজায় রাখার জন্য) */}
+            <div className="flex items-center shrink-0" aria-hidden="true">
+              {currentMarquee.map((item, idx) => (
+                <span key={`2-${idx}`} className="inline-flex items-center gap-2 px-4">
+                  {item.icon} <span>{item.text}</span>
+                  <span className="ml-4 opacity-50">•</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </nav>
@@ -151,11 +157,11 @@ export default function Navbar({ lang, toggleLanguage }) {
       {/* Left Slide Sidebar (Drawer) for Mobile */}
       <div className={`fixed top-0 left-0 h-full w-[80%] max-w-xs bg-zinc-950 border-r border-zinc-900 z-50 transform transition-transform duration-300 ease-in-out shadow-2xl flex flex-col justify-between ${isOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div>
-          {/* Sidebar Header */}
           <div className="flex items-center justify-between px-5 h-16 sm:h-20 border-b border-zinc-900">
             <span className="text-lg font-black tracking-wider text-white">
               ZYNTRIX<span className="text-blue-500">LAB</span>
             </span>
+
             <button 
               onClick={() => setIsOpen(false)}
               className="text-zinc-400 hover:text-white p-2 rounded-lg bg-zinc-900 border border-zinc-800 transition-colors cursor-pointer"
@@ -165,7 +171,6 @@ export default function Navbar({ lang, toggleLanguage }) {
             </button>
           </div>
 
-          {/* Sidebar Menu Items */}
           <ul className="flex flex-col p-5 space-y-2 sm:space-y-3 overflow-y-auto max-h-[calc(100vh-180px)]">
             {currentMenu.map((item, index) => (
               <li key={index}>
@@ -181,7 +186,6 @@ export default function Navbar({ lang, toggleLanguage }) {
           </ul>
         </div>
 
-        {/* Sidebar Footer Action */}
         <div className="p-5 border-t border-zinc-900 bg-zinc-950">
           <a 
             href="#contact" 

@@ -3,15 +3,32 @@
 @theme {
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  
+  /* Tailwind v4 এর নিজস্ব নিয়মে অ্যানিমেশন ও কি-ফ্রেম যুক্ত করা হলো */
+  --keyframes-marquee: marquee 10s linear infinite;
+  
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
 }
 
-/* অ্যানিমেশন কি-ফ্রেম */
+/* অথবা যদি ক্লাসের মাধ্যমে কন্ট্রোল করতে চান */
 @keyframes marquee {
-  0% { transform: translateX(100%); }
-  100% { transform: translateX(-100%); }
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-/* 100s ডিউরেশন দিলে অ্যানিমেশনটি অনেক বেশি স্লো এবং প্রফেশনাল হবে */
 .animate-marquee {
-  animation: marquee 100s linear infinite;
+  display: flex;
+  width: max-content;
+  animation: marquee 60s linear infinite;
 }
