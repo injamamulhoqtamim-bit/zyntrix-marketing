@@ -3,13 +3,13 @@ import Image from 'next/image';
 
 const teamMembers = [
   {
-    name: 'Tanvir Ahmed',
+    name: 'Injamamul Hoq',
     role: 'Lead Developer & Founder',
     image: '/member1.png',
     whatsapp: 'https://wa.me/8801511994008',
   },
   {
-    name: 'Sarah Rahman',
+    name: 'Sazid Hassan Rahat',
     role: 'UI/UX Designer & Strategist',
     image: '/member2.jpg',
     whatsapp: 'https://wa.me/8801912585387',

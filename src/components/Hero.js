@@ -2,10 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export default function Hero({ onShowAuth }) {
+export default function Hero() {
   const videos = ["/hero.mp4", "/hero2.mp4", "/hero3.mp4"];
   const [currentVideo, setCurrentVideo] = useState(0);
-  const [isPopupOpen, setIsPopupOpen] = useState(true); // পপআপ স্টেট
   const videoRef = useRef(null);
 
   const handleVideoEnd = () => {
@@ -30,36 +29,6 @@ export default function Hero({ onShowAuth }) {
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/65"></div>
-
-      {/* Popup Message - Responsive sizing and positioning */}
-      {isPopupOpen && (
-        <div className="fixed bottom-4 right-4 left-4 sm:left-auto sm:bottom-6 sm:right-6 z-50 bg-zinc-900/95 backdrop-blur-md border border-blue-500/50 p-4 sm:p-6 rounded-2xl shadow-2xl max-w-sm sm:w-full animate-in slide-in-from-bottom-10 fade-in duration-500">
-          <button
-            onClick={() => setIsPopupOpen(false)}
-            className="absolute top-3 right-3 text-zinc-400 hover:text-white p-1"
-            aria-label="Close popup"
-          >
-            ✕
-          </button>
-          <h3 className="text-white font-bold text-base sm:text-lg mb-3 pr-6">
-            ডিজিটাল মার্কেটিং ও সাইবার সিকিউরিটি শিখতে চান?
-          </h3>
-          <button
-            onClick={() => {
-              setIsPopupOpen(false); // পপআপ বন্ধ হবে
-              onShowAuth(); // AuthSection দৃশ্যমান করবে
-              
-              // সেকশনটি DOM এ আসার পর স্মুথ স্ক্রল করার জন্য সামান্য দেরি দিচ্ছি
-              setTimeout(() => {
-                document.getElementById('learning-section')?.scrollIntoView({ behavior: 'smooth' });
-              }, 100);
-            }}
-            className="block w-full py-2.5 text-center bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold text-sm transition"
-          >
-            Click Here
-          </button>
-        </div>
-      )}
 
       {/* Content */}
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 text-center w-full">

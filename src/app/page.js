@@ -61,9 +61,7 @@ export default function Home() {
         <Contact />
       </div>
 
-      <div id="contact">
-        <Contact />
-      </div>
+      
 
       <Footer />
 

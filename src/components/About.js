@@ -53,7 +53,7 @@ export default function About({ onShowTeam }) {
               onClick={onShowTeam}
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-300 bg-blue-600 rounded-xl hover:bg-blue-500 shadow-lg shadow-blue-600/30 cursor-pointer text-sm sm:text-base text-center"
             >
-              See Team Information
+              আমাদের টিম সম্পর্কে আরও জানতে এখানে ক্লিক করুন 
             </button>
           </div>
 
