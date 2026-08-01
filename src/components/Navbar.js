@@ -30,6 +30,11 @@ export default function Navbar({ lang, toggleLanguage }) {
     en: [
       { icon: <Rocket size={16} />, text: "WELCOME TO ZYNTRIX LAB" },
       { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কিটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
+      { icon: <Target size={16} />, text: "অ্যাকাউন্ট সিকিউরিটি শিখতে চান? " },
+      { icon: <Target size={16} />, text: "লক/ডিজেবল আইডি রিকভার করতে চান?" },
+      { icon: <Target size={16} />, text: "কপিরাইট ম্যানেজমেন্ট শিখতে চান?" },
+      { icon: <Target size={16} />, text: "Meta Verified সম্পর্কে জানতে চান?" },
+      { icon: <Target size={16} />, text: "সোশ্যাল মিডিয়া সিকিউরিটিতে দক্ষ হতে চান?" },
       { icon: <Globe size={16} />, text: "MODERN WEB SOLUTIONS" },
       { icon: <Palette size={16} />, text: "UI/UX DESIGN" },
       { icon: <TrendingUp size={16} />, text: "DIGITAL MARKETING" },
