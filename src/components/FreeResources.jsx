@@ -25,7 +25,7 @@ export default function FreeResources({ lang = "en" }) {
       card2Link: "https://drive.google.com/drive/folders/1uszP50mxR3K59cKqTrIOwQmH8PaKHJ0V?usp=drive_link",
       // নতুন কার্ডের ইংরেজি টেক্সট
       card3Title: "Cyber Security Expert for Social Media",
-      card3Sub: "Protect your accounts and digital footprint",
+      card3Sub: "সোশ্যাল মিডিয়া সিকিউরিটি, অ্যাকাউন্ট রিকভারি, ডিজেবল/ব্যান, কপিরাইট ও মেটা সলিউশনসহ সম্পূর্ণ প্রফেশনাল ট্রেনিং।",
       card3Link: "https://drive.google.com/drive/folders/1eJrij244cBqwKYOpFedxRnR7hX99mYj0?usp=drive_link",
       watchBtn: "Watch Free",
       mainBtnText: "View All Videos",
