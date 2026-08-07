@@ -124,21 +124,25 @@ export default function FreeResources({ lang = "en" }) {
                 <div>
                   {/* Image check & Error Fallback */}
                   {item.image && item.image.trim() !== "" ? (
-                    <a href={item.link} target="_blank" rel="noopener noreferrer">
-                      <img 
-                        src={item.image.startsWith("/") || item.image.startsWith("http") ? item.image : `/${item.image}`} 
-                        alt={item.title} 
-                        className="w-full h-60 object-cover rounded-xl bg-zinc-800"
-                        onError={(e) => {
-                          e.target.style.display = 'none';
-                        }}
-                      />
-                    </a>
-                  ) : (
-                    <div className="w-full h-60 rounded-xl bg-gradient-to-br from-blue-900/40 to-zinc-800 flex items-center justify-center border border-zinc-800">
-                      <Play className="w-12 h-12 text-blue-400 opacity-60" />
-                    </div>
-                  )}
+  <a href={item.link} target="_blank" rel="noopener noreferrer">
+    <img 
+      src={
+        item.image.startsWith("http") 
+          ? item.image 
+          : encodeURI(item.image.startsWith("/") ? item.image : `/${item.image}`)
+      } 
+      alt={item.title} 
+      className="w-full h-60 object-cover rounded-xl bg-zinc-800"
+      onError={(e) => {
+        e.target.style.display = 'none';
+      }}
+    />
+  </a>
+) : (
+  <div className="w-full h-60 rounded-xl bg-gradient-to-br from-blue-900/40 to-zinc-800 flex items-center justify-center border border-zinc-800">
+    <Play className="w-12 h-12 text-blue-400 opacity-60" />
+  </div>
+)}
 
                   <h3 className="text-2xl font-bold mt-5">
                     {item.title}
