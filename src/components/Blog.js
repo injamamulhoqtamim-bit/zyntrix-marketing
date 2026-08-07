@@ -1,6 +1,8 @@
-import React from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+"use client";
+
+import { useState, useEffect } from "react";
+import Image from "next/image";
+import Link from "next/link";
 
 const blogData = {
   en: {
@@ -63,16 +65,16 @@ const blogData = {
     titlePart1: "আমাদের সর্বশেষ",
     titleHighlight: "ব্লগগুলো দেখুন",
     description: "জাইন্ট্রিক্স ল্যাব টিম কর্তৃক সাজানো সাম্প্রতিক ইন্ডাস্ট্রি ট্রেন্ড, টেক গাইড এবং গ্রোথ স্ট্র্যাটেজির সাথে আপডেট থাকুন।",
-    readMore: "পড়ুন",
+    readMore: "পড়ুন",
     viewAll: "সব আর্টিকেল দেখুন",
     posts: [
       {
         id: '1',
         title: 'কীভাবে এআই অটোমেশন ২০২৬ সালে আধুনিক ডিজিটাল মার্কেটিং বদলে দিচ্ছে',
-        excerpt: 'কৃত্রিম বুদ্ধিমত্তা কীভাবে মার্কেটিং ওয়ার্কফ্লো সহজ করছে, কনভার্শন রেট বাড়াচ্ছে এবং ক্যাম্পেইনের আরওআই অপ্টিমাইজ করছে তা আবিষ্কার করুন।',
+        excerpt: 'কৃত্রিম বুদ্ধিমত্তা কীভাবে মার্কেটিং ওয়ার্কফ্লো সহজ করছে, কনভার্শন রেট বাড়াচ্ছে এবং ক্যাম্পেইনের আরওআই অপ্টিমাইজ করছে তা আবিষ্কার করুন।',
         category: 'এআই ও অটোমেশন',
         date: 'জুলাই ২৪, ২০২৬',
-        readTime: '৫ মিনিট পড়া',
+        readTime: '৫ মিনিট পড়া',
         image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800',
         author: {
           name: 'জাইন্ট্রিক্স টিম',
@@ -87,7 +89,7 @@ const blogData = {
         excerpt: 'সার্ভার কম্পোনেন্টস থেকে এজ ফাংশনস—আধুনিক হাই-পারফরম্যান্স ওয়েব অ্যাপ্লিকেশন পরিচালনাকারী প্রযুক্তিগুলো সম্পর্কে জানুন।',
         category: 'ওয়েব ডেভেলপমেন্ট',
         date: 'জুলাই ১৮, ২০২৬',
-        readTime: '৭ মিনিট পড়া',
+        readTime: '৭ মিনিট পড়া',
         image: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=800',
         author: {
           name: 'তানভীর আহমেদ',
@@ -102,7 +104,7 @@ const blogData = {
         excerpt: 'অত্যাবশ্যকীয় ব্র্যান্ডিং নীতিগুলো শিখুন যা বিশ্বাস স্থাপন করে, ইউজার এক্সপেরিয়েন্স উন্নত করে এবং টেকসই ব্যবসায়িক বৃদ্ধিতে সাহায্য করে।',
         category: 'ব্র্যান্ডিং',
         date: 'জুলাই ১০, ২০২৬',
-        readTime: '৪ মিনিট পড়া',
+        readTime: '৪ মিনিট পড়া',
         image: 'https://images.unsplash.com/photo-1542744094-3a31b272c490?auto=format&fit=crop&q=80&w=800',
         author: {
           name: 'সারা রহমান',
@@ -116,7 +118,29 @@ const blogData = {
 };
 
 export default function Blog({ lang = "en" }) {
-  const t = blogData[lang] || blogData.en;
+  const [posts, setPosts] = useState([]);
+  const staticContent = blogData[lang] || blogData.en;
+
+  // ডাটাবেস বা API থেকে ব্লগ পোস্ট ফেচ করার জন্য
+  useEffect(() => {
+    async function fetchBlogs() {
+      try {
+        const res = await fetch('/api/content'); // আপনার ব্যাকএন্ড API রুট অনুযায়ী পাথ দিন
+        const data = await res.json();
+        if (data && data.blogs && data.blogs.length > 0) {
+          setPosts(data.blogs);
+        } else {
+          setPosts(staticContent.posts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch blogs:", error);
+        setPosts(staticContent.posts);
+      }
+    }
+    fetchBlogs();
+  }, [lang]);
+
+  const displayPosts = posts.length > 0 ? posts : staticContent.posts;
 
   return (
     <section className="py-16 sm:py-24 bg-slate-950 text-white relative overflow-hidden">
@@ -127,21 +151,21 @@ export default function Blog({ lang = "en" }) {
         {/* Centered Section Header */}
         <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
           <span className="inline-block px-3.5 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full mb-3">
-            {t.badge}
+            {staticContent.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            {t.titlePart1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">{t.titleHighlight}</span>
+            {staticContent.titlePart1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">{staticContent.titleHighlight}</span>
           </h2>
           <p className="mt-3 sm:mt-4 text-slate-400 text-sm sm:text-lg max-w-2xl px-2">
-            {t.description}
+            {staticContent.description}
           </p>
         </div>
 
         {/* Blog Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {t.posts.map((post) => (
+          {displayPosts.map((post, index) => (
             <article
-              key={post.id}
+              key={post.id || index}
               className="flex flex-col bg-slate-900/60 border border-slate-800/80 rounded-2xl overflow-hidden hover:border-slate-700 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group"
             >
               <div className="relative h-48 sm:h-52 w-full overflow-hidden bg-slate-800">
@@ -168,7 +192,7 @@ export default function Blog({ lang = "en" }) {
                 </div>
 
                 <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
-                  <Link href={`/blog/${post.slug}`}>
+                  <Link href={`/blog/${post.slug || '#'}`}>
                     {post.title}
                   </Link>
                 </h3>
@@ -181,26 +205,28 @@ export default function Blog({ lang = "en" }) {
 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2.5 sm:space-x-3">
-                    <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-slate-700 flex-shrink-0">
-                      <Image
-                        src={post.author.avatar}
-                        alt={post.author.name}
-                        fill
-                        className="object-cover"
-                        unoptimized
-                      />
-                    </div>
+                    {post.author?.avatar && (
+                      <div className="relative w-7 h-7 sm:w-8 sm:h-8 rounded-full overflow-hidden border border-slate-700 flex-shrink-0">
+                        <Image
+                          src={post.author.avatar}
+                          alt={post.author.name || 'Author'}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                    )}
                     <div>
-                      <p className="text-[11px] sm:text-xs font-semibold text-slate-200 line-clamp-1">{post.author.name}</p>
-                      <p className="text-[9px] sm:text-[10px] text-slate-400 line-clamp-1">{post.author.role}</p>
+                      <p className="text-[11px] sm:text-xs font-semibold text-slate-200 line-clamp-1">{post.author?.name}</p>
+                      <p className="text-[9px] sm:text-[10px] text-slate-400 line-clamp-1">{post.author?.role}</p>
                     </div>
                   </div>
 
                   <Link
-                    href={`/blog/${post.slug}`}
+                    href={`/blog/${post.slug || '#'}`}
                     className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 group/btn flex-shrink-0"
                   >
-                    {t.readMore}
+                    {staticContent.readMore}
                     <svg
                       className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 transition-transform"
                       fill="none"
@@ -222,7 +248,7 @@ export default function Blog({ lang = "en" }) {
             href="/blog"
             className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 sm:py-3 text-sm font-semibold text-white bg-slate-900 border border-slate-800 rounded-xl hover:bg-slate-800 hover:border-slate-700 transition-all duration-300 group shadow-lg text-center"
           >
-            {t.viewAll}
+            {staticContent.viewAll}
             <svg
               className="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform"
               fill="none"

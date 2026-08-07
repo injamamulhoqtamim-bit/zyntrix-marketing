@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Content from "@/models/Content";
 
+// এটি নেক্সট জেএস কে বলে দিবে যেন বিল্ড টাইমে এই রুটটি ক্র্যাশ না করে
+export const dynamic = 'force-dynamic';
+
 // GET
 export async function GET(request) {
   try {
@@ -49,19 +52,16 @@ export async function POST(request) {
     const contentType = request.headers.get("content-type") || "";
     let body = {};
 
-    // FormData বা ফাইল আপলোড হ্যান্ডেল করার জন্য
     if (contentType.includes("multipart/form-data")) {
       const formData = await request.formData();
       for (const [key, value] of formData.entries()) {
         body[key] = value;
       }
 
-      // যদি ইমেজ ফাইল অবজেক্ট হিসেবে আসে
       if (body.image && typeof body.image === "object") {
         body.image = body.image.name ? `/uploads/${body.image.name}` : "";
       }
     } else {
-      // সাধারণ JSON ডেটার জন্য
       body = await request.json();
     }
 
@@ -94,7 +94,6 @@ export async function DELETE(request) {
     await connectDB();
 
     const { searchParams } = new URL(request.url);
-
     const id = searchParams.get("id");
 
     await Content.findByIdAndDelete(id);
