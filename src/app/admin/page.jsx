@@ -43,6 +43,7 @@ export default function AdminPage() {
     category: "",
     link: "",
     image: null,
+    imageUrl: "", // সরাসরি ইমেজ লিংক দেওয়ার জন্য
     numberValue: "",
   });
 
@@ -194,6 +195,12 @@ export default function AdminPage() {
       formData.append("category", form.category);
       formData.append("link", form.link);
       formData.append("numberValue", form.numberValue);
+      
+      // যদি ইউজার ইমেজ ইউআরএল (যেমন Cloudinary লিংক) দেয়, সেটি পাঠাবো
+      if (form.imageUrl) {
+        formData.append("imageUrl", form.imageUrl);
+      }
+
       if (editingId) formData.append("id", editingId);
       if (form.image instanceof File) {
         formData.append("image", form.image);
@@ -226,6 +233,7 @@ export default function AdminPage() {
           category: "",
           link: "",
           image: null,
+          imageUrl: "",
           numberValue: "",
         });
 
@@ -394,6 +402,7 @@ export default function AdminPage() {
                       category: "",
                       link: "",
                       image: null,
+                      imageUrl: "",
                       numberValue: "",
                     });
                     setImagePreview("");
@@ -574,10 +583,25 @@ export default function AdminPage() {
             )}
 
             {form.section !== "stats" && (
-              <div>
-                <label className="font-semibold text-zinc-300 block mb-2">
-                  Upload Image File
+              <div className="space-y-4">
+                <label className="font-semibold text-zinc-300 block">
+                  Image Source (Cloudinary / Image URL অথবা ফাইল আপলোড)
                 </label>
+                
+                {/* সরাসরি ইমেজ লিংক দেওয়ার ইনপুট (Vercel-এর জন্য সেরা সমাধান) */}
+                <input
+                  type="url"
+                  className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full text-white focus:outline-none focus:border-blue-500"
+                  placeholder="Paste direct Image URL (e.g. Cloudinary link)"
+                  value={form.imageUrl}
+                  onChange={(e) => {
+                    setForm({ ...form, imageUrl: e.target.value });
+                    setImagePreview(e.target.value);
+                  }}
+                />
+
+                <div className="text-center text-xs text-zinc-500">OR</div>
+
                 <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-700 bg-zinc-950 rounded-xl p-6 cursor-pointer hover:border-blue-500 transition-colors">
                   <Upload className="text-zinc-400 mb-2" size={24} />
                   <span className="text-sm text-zinc-300 font-medium">
@@ -593,7 +617,7 @@ export default function AdminPage() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        setForm({ ...form, image: file });
+                        setForm({ ...form, image: file, imageUrl: "" });
                         setImagePreview(URL.createObjectURL(file));
                       }
                     }}
@@ -672,6 +696,7 @@ export default function AdminPage() {
                       category: "",
                       link: "",
                       image: null,
+                      imageUrl: "",
                       numberValue: "",
                     });
                   }}
@@ -775,7 +800,11 @@ export default function AdminPage() {
                       {item.image ? (
                         <div className="relative w-52 h-36 mt-3">
                           <Image
-                            src={item.image}
+                            src={
+                              item.image.startsWith("http")
+                                ? item.image
+                                : encodeURI(item.image.startsWith("/") ? item.image : `/${item.image}`)
+                            }
                             width={208}
                             height={144}
                             alt={item.title}
@@ -805,6 +834,7 @@ export default function AdminPage() {
                             category: item.category || "",
                             link: item.link || "",
                             image: item.image || null,
+                            imageUrl: item.image?.startsWith("http") ? item.image : "",
                             numberValue: item.numberValue || "",
                           });
                           window.scrollTo({
