@@ -19,7 +19,7 @@ const projectsData = {
         description: "Secure online voting system designed in Figma with modern UI/UX principles.",
         link: "https://www.figma.com/design/f5fPOItcW37J6lwI01t2XS/e-voting-bd?node-id=0-1&p=f",
         buttonText: "View Figma Design",
-        image: "/E-voting app.jpg"
+        image: "/evoting-app.jpg"
       },
       {
         title: "Fitness App",
@@ -28,7 +28,7 @@ const projectsData = {
         description: "A clean, user-friendly fitness app designed to motivate users and support their goals through simple and visually engaging design.",
         link: "https://www.figma.com/design/LpKE6LblNOMTOlVv8NKOaQ/Assingment-class-01?node-id=0-1&p=f",
         buttonText: "View Figma Design",
-        image: "/fitness app.jpg"
+        image: "/fitness-app.jpg"
       },
       {
         title: "E-Learning App",
@@ -37,7 +37,7 @@ const projectsData = {
         description: "An intuitive platform for learning, growing, and mastering new skills anytime, anywhere.",
         link: "https://www.figma.com/design/Yb4iewfZ5SaGfc9NFguoB0/larning-platfrom?node-id=1-6",
         buttonText: "View Figma Design",
-        image: "/Unlock App.jpg"
+        image: "/unlock-app.jpg"
       },
       {
         title: "Teachers Finding Platform",
@@ -80,7 +80,7 @@ const projectsData = {
         title: "ফিটনেস অ্যাপ",
         category: "ইউআই/ইউএক্স ডিজাইন",
         categoryKey: "UI/UX Design",
-        description: "ব্যবহারকারীদের উৎসাহিত করতে এবং সাধারণ ও আকর্ষণীয় ডিজাইনের মাধ্যমে তাদের লক্ষ্য অর্জনে সহায়তাকারী একটি ফিটনেস অ্যাপ।",
+        description: "ব্যবহারকারীদের উৎসাহিত করতে এবং সাধারণ ও আকর্ষণীয় ডিজাইনের মাধ্যমে তাদের লক্ষ্য অর্জনে সহায়তাকারী একটি ফিটনেস অ্যাপ।",
         link: "https://www.figma.com/design/LpKE6LblNOMTOlVv8NKOaQ/Assingment-class-01?node-id=0-1&p=f",
         buttonText: "ফিগা ডিজাইন দেখুন",
         image: "/fitness-app.jpg"
@@ -89,10 +89,10 @@ const projectsData = {
         title: "ই-লার্নিং অ্যাপ",
         category: "ইউআই/ইউএক্স ডিজাইন",
         categoryKey: "UI/UX Design",
-        description: "যেকোনো সময়, যেকোনো স্থান থেকে নতুন দক্ষতা অর্জন এবং শেখার একটি সহজ প্ল্যাটফর্ম।",
+        description: "যেকোনো সময়, যেকোনো স্থান থেকে নতুন দক্ষতা অর্জন এবং শেখার একটি সহজ প্ল্যাটফর্ম।",
         link: "https://www.figma.com/design/Yb4iewfZ5SaGfc9NFguoB0/larning-platfrom?node-id=1-6",
         buttonText: "ফিগা ডিজাইন দেখুন",
-        image: "/unlock-App.jpg"
+        image: "/unlock-app.jpg"
       },
       {
         title: "শিক্ষক সন্ধান প্ল্যাটফর্ম",
@@ -162,7 +162,10 @@ export default function Projects({ lang = "en" }) {
                     src={project.image} 
                     alt={project.title} 
                     fill
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-500" 
+                    priority={index === 0}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover hover:scale-105 transition-transform duration-500" 
                   />
                 </div>
 
@@ -178,7 +181,7 @@ export default function Projects({ lang = "en" }) {
                   href={project.link} 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="block w-full text-center bg-zinc-800 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition text-sm sm:text-base shadow-md"
+                  className="block w-full text-center bg-zinc-800 hover:bg-blue-600 text-white font-bold py-3 rounded-xl transition text-sm sm:text-base shadow-md cursor-pointer"
                 >
                   {project.buttonText}
                 </a>
