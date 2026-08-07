@@ -74,7 +74,7 @@ const projectsData = {
         description: "আধুনিক ইউআই/ইউএক্স নীতি অনুসরণ করে ফিগমাতে ডিজাইন করা নিরাপদ অনলাইন ভোটিং সিস্টেম।",
         link: "https://www.figma.com/design/f5fPOItcW37J6lwI01t2XS/e-voting-bd?node-id=0-1&p=f",
         buttonText: "ফিগা ডিজাইন দেখুন",
-        image: "/E-voting app.jpg"
+        image: "/evoting-app.jpg"
       },
       {
         title: "ফিটনেস অ্যাপ",
@@ -83,7 +83,7 @@ const projectsData = {
         description: "ব্যবহারকারীদের উৎসাহিত করতে এবং সাধারণ ও আকর্ষণীয় ডিজাইনের মাধ্যমে তাদের লক্ষ্য অর্জনে সহায়তাকারী একটি ফিটনেস অ্যাপ।",
         link: "https://www.figma.com/design/LpKE6LblNOMTOlVv8NKOaQ/Assingment-class-01?node-id=0-1&p=f",
         buttonText: "ফিগা ডিজাইন দেখুন",
-        image: "/fitness app.jpg"
+        image: "/fitness-app.jpg"
       },
       {
         title: "ই-লার্নিং অ্যাপ",
@@ -92,7 +92,7 @@ const projectsData = {
         description: "যেকোনো সময়, যেকোনো স্থান থেকে নতুন দক্ষতা অর্জন এবং শেখার একটি সহজ প্ল্যাটফর্ম।",
         link: "https://www.figma.com/design/Yb4iewfZ5SaGfc9NFguoB0/larning-platfrom?node-id=1-6",
         buttonText: "ফিগা ডিজাইন দেখুন",
-        image: "/Unlock App.jpg"
+        image: "/unlock-App.jpg"
       },
       {
         title: "শিক্ষক সন্ধান প্ল্যাটফর্ম",
