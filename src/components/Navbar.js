@@ -5,6 +5,9 @@ import { Rocket, Globe, Palette, TrendingUp, Zap, Smartphone, Search, Award, Bri
 export default function Navbar({ lang, toggleLanguage }) {
   const [isOpen, setIsOpen] = useState(false);
 
+  // ভাষার মান নিশ্চিত করার জন্য
+  const currentLang = lang && lang.toLowerCase() === "bn" ? "bn" : "en";
+
   const menuItems = {
     en: [
       { name: "Home", href: "#" },
@@ -29,12 +32,7 @@ export default function Navbar({ lang, toggleLanguage }) {
   const marqueeItems = {
     en: [
       { icon: <Rocket size={16} />, text: "WELCOME TO ZYNTRIX LAB" },
-      { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কিটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
-      { icon: <Target size={16} />, text: "অ্যাকাউন্ট সিকিউরিটি শিখতে চান? " },
-      { icon: <Target size={16} />, text: "লক/ডিজেবল আইডি রিকভার করতে চান?" },
-      { icon: <Target size={16} />, text: "কপিরাইট ম্যানেজমেন্ট শিখতে চান?" },
-      { icon: <Target size={16} />, text: "Meta Verified সম্পর্কে জানতে চান?" },
-      { icon: <Target size={16} />, text: "সোশ্যাল মিডিয়া সিকিউরিটিতে দক্ষ হতে চান?" },
+      { icon: <Target size={16} />, text: "Digital Marketing Course Master SEO, Social Media & Ads" },
       { icon: <Globe size={16} />, text: "MODERN WEB SOLUTIONS" },
       { icon: <Palette size={16} />, text: "UI/UX DESIGN" },
       { icon: <TrendingUp size={16} />, text: "DIGITAL MARKETING" },
@@ -50,7 +48,7 @@ export default function Navbar({ lang, toggleLanguage }) {
     ],
     bn: [
       { icon: <Rocket size={16} />, text: "জাইন্ট্রিক্স ল্যাবে স্বাগতম" },
-      { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কিটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
+      { icon: <Target size={16} />, text: "আপনি কি ডিজিটাল মার্কেটিং এবং সাইবার সিকিউরিটি ও ইথিকাল হ্যাকিং শিখতে চান ?" },
       { icon: <Globe size={16} />, text: "মডার্ন ওয়েব সলিউশন" },
       { icon: <Palette size={16} />, text: "ইউআই/ইউএক্স ডিজাইন" },
       { icon: <TrendingUp size={16} />, text: "ডিজিটাল মার্কেটিং" },
@@ -66,8 +64,8 @@ export default function Navbar({ lang, toggleLanguage }) {
     ],
   };
 
-  const currentMenu = menuItems[lang] || menuItems.en;
-  const currentMarquee = marqueeItems[lang] || marqueeItems.en;
+  const currentMenu = menuItems[currentLang] || menuItems.en;
+  const currentMarquee = marqueeItems[currentLang] || marqueeItems.en;
 
   return (
     <>
@@ -97,11 +95,11 @@ export default function Navbar({ lang, toggleLanguage }) {
               aria-label="Toggle Language"
             >
               <Languages size={15} className="text-blue-500" />
-              <span>{lang === "en" ? "বাংলা" : "English"}</span>
+              <span>{currentLang === "en" ? "বাংলা" : "English"}</span>
             </button>
 
             <a href="#contact" className="bg-blue-600 hover:bg-blue-700 text-white text-xs lg:text-sm font-semibold px-4 lg:px-5 py-2.5 rounded-lg transition-all shadow-lg shadow-blue-600/30">
-              {lang === "en" ? "Request Service" : "সেবা নিন"}
+              {currentLang === "en" ? "Request Service" : "সেবা নিন"}
             </a>
           </div>
 
@@ -113,7 +111,7 @@ export default function Navbar({ lang, toggleLanguage }) {
               aria-label="Toggle Language"
             >
               <Languages size={14} className="text-blue-500" />
-              <span>{lang === "en" ? "বাংলা" : "EN"}</span>
+              <span>{currentLang === "en" ? "বাংলা" : "EN"}</span>
             </button>
 
             <button 
@@ -138,7 +136,7 @@ export default function Navbar({ lang, toggleLanguage }) {
                 </span>
               ))}
             </div>
-            {/* দ্বিতীয় সেট (seamless লুপ বজায় রাখার জন্য) */}
+            {/* দ্বিতীয় সেট (seamless লুপ বজায় রাখার জন্য) */}
             <div className="flex items-center shrink-0" aria-hidden="true">
               {currentMarquee.map((item, idx) => (
                 <span key={`2-${idx}`} className="inline-flex items-center gap-2 px-4">
@@ -197,7 +195,7 @@ export default function Navbar({ lang, toggleLanguage }) {
             onClick={() => setIsOpen(false)}
             className="flex items-center justify-center w-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold py-3 rounded-xl transition-all shadow-lg shadow-blue-600/30 text-center"
           >
-            {lang === "en" ? "Request Service" : "সেবা নিন"}
+            {currentLang === "en" ? "Request Service" : "সেবা নিন"}
           </a>
         </div>
       </div>

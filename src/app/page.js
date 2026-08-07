@@ -6,7 +6,7 @@ import Hero from "../components/Hero";
 import About from "../components/About";
 import Team from "../components/Team";
 import Services from "../components/Services";
-import FreeResources from "../components/FreeResources"; // Free Resources কম্পোনেন্ট ইমপোর্ট করা হলো
+import FreeResources from "../components/FreeResources";
 import Projects from "../components/Projects";
 import Pricing from "../components/Pricing";
 import Blog from "../components/Blog";
@@ -64,7 +64,7 @@ export default function Home() {
       {/* Services Section */}
       <Services lang={lang} />
 
-      {/* Free Learning Resources Section (Services এর ঠিক পরে বসানো হলো) */}
+      {/* Free Learning Resources Section */}
       <FreeResources lang={lang} />
 
       {/* Projects Section */}
