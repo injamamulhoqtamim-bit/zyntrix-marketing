@@ -156,11 +156,7 @@ export default function Blog({ lang = "en" }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Centered Section Header */}
         <div className="flex items-center text-[11px] sm:text-xs text-slate-400 gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
-  <span>
-    {post.createdAt
-      ? new Date(post.createdAt).toLocaleDateString()
-      : ""}
-  </span>
+  
 </div>
 
         {/* Blog Cards Grid */}
