@@ -1,18 +1,9 @@
 import mongoose from "mongoose";
-import dns from "node:dns";
-
-dns.setServers(["8.8.8.8", "1.1.1.1"]);
-
-console.log("DNS:", dns.getServers());
 
 const MONGODB_URI = process.env.MONGODB_URI;
-console.log("URI Exists:", !!process.env.MONGODB_URI);
-console.log("NODE_ENV:", process.env.NODE_ENV);
-
-console.log("Connecting to:", MONGODB_URI);
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable");
+  throw new Error("MONGODB_URI is not defined");
 }
 
 let cached = global.mongoose;
@@ -25,15 +16,25 @@ if (!cached) {
 }
 
 async function connectDB() {
-  if (cached.conn) return cached.conn;
+  if (cached.conn) {
+    return cached.conn;
+  }
 
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 10000,
     });
   }
 
-  cached.conn = await cached.promise;
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
+
   return cached.conn;
 }
 
