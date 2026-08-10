@@ -123,24 +123,30 @@ export default function Blog({ lang = "en" }) {
 
   // ডাটাবেস বা API থেকে ব্লগ পোস্ট ফেচ করার জন্য
   useEffect(() => {
-    async function fetchBlogs() {
-      try {
-        const res = await fetch('/api/content'); // আপনার ব্যাকএন্ড API রুট অনুযায়ী পাথ দিন
-        const data = await res.json();
-        if (data && data.blogs && data.blogs.length > 0) {
-          setPosts(data.blogs);
-        } else {
-          setPosts(staticContent.posts);
-        }
-      } catch (error) {
-        console.error("Failed to fetch blogs:", error);
-        setPosts(staticContent.posts);
-      }
-    }
-    fetchBlogs();
-  }, [lang]);
+  async function fetchBlogs() {
+    try {
+      const res = await fetch('/api/content');
+      const data = await res.json();
 
-  const displayPosts = posts.length > 0 ? posts : staticContent.posts;
+      if (data?.success && Array.isArray(data.data)) {
+        const blogs = data.data.filter(
+          (item) => item.section === "blogs" || item.section === "blog"
+        );
+
+        setPosts(blogs);
+      } else {
+        setPosts([]);
+      }
+    } catch (error) {
+      console.error("Failed to fetch blogs:", error);
+      setPosts([]);
+    }
+  }
+
+  fetchBlogs();
+}, [lang]);
+
+  const displayPosts = posts;
 
   return (
     <section className="py-16 sm:py-24 bg-slate-950 text-white relative overflow-hidden">
@@ -149,17 +155,13 @@ export default function Blog({ lang = "en" }) {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Centered Section Header */}
-        <div className="flex flex-col items-center text-center mb-12 sm:mb-16">
-          <span className="inline-block px-3.5 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-blue-400 bg-blue-500/10 border border-blue-500/20 rounded-full mb-3">
-            {staticContent.badge}
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white tracking-tight leading-tight">
-            {staticContent.titlePart1} <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">{staticContent.titleHighlight}</span>
-          </h2>
-          <p className="mt-3 sm:mt-4 text-slate-400 text-sm sm:text-lg max-w-2xl px-2">
-            {staticContent.description}
-          </p>
-        </div>
+        <div className="flex items-center text-[11px] sm:text-xs text-slate-400 gap-2.5 sm:gap-3 mb-2.5 sm:mb-3">
+  <span>
+    {post.createdAt
+      ? new Date(post.createdAt).toLocaleDateString()
+      : ""}
+  </span>
+</div>
 
         {/* Blog Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
@@ -198,7 +200,7 @@ export default function Blog({ lang = "en" }) {
                 </h3>
 
                 <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-slate-400 line-clamp-3 leading-relaxed flex-1">
-                  {post.excerpt}
+                  {post.subtitle}
                 </p>
 
                 <div className="my-4 sm:my-5 border-t border-slate-800/80" />

@@ -23,17 +23,10 @@ async function connectDB() {
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
       bufferCommands: false,
-      maxPoolSize: 10,
-      serverSelectionTimeoutMS: 10000,
     });
   }
 
-  try {
-    cached.conn = await cached.promise;
-  } catch (error) {
-    cached.promise = null;
-    throw error;
-  }
+  cached.conn = await cached.promise;
 
   return cached.conn;
 }
