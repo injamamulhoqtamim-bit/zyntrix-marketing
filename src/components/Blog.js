@@ -190,10 +190,14 @@ export default function Blog({ lang = "en" }) {
                 </div>
 
                 <h3 className="text-lg sm:text-xl font-bold text-white group-hover:text-blue-400 transition-colors line-clamp-2 leading-snug">
-                  <Link href={`/blog/${post.slug || '#'}`}>
-                    {post.title}
-                  </Link>
-                </h3>
+  <Link
+    href={post.link || "#"}
+    target={post.link ? "_blank" : undefined}
+    rel={post.link ? "noopener noreferrer" : undefined}
+  >
+    {post.title}
+  </Link>
+</h3>
 
                 <p className="mt-2.5 sm:mt-3 text-xs sm:text-sm text-slate-400 line-clamp-3 leading-relaxed flex-1">
                   {post.subtitle}
@@ -221,19 +225,26 @@ export default function Blog({ lang = "en" }) {
                   </div>
 
                   <Link
-                    href={`/blog/${post.slug || '#'}`}
-                    className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 group/btn flex-shrink-0"
-                  >
-                    {staticContent.readMore}
-                    <svg
-                      className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 transition-transform"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </Link>
+  href={post.link || "#"}
+  target={post.link ? "_blank" : undefined}
+  rel={post.link ? "noopener noreferrer" : undefined}
+  className="text-xs font-semibold text-blue-400 hover:text-blue-300 inline-flex items-center gap-1 group/btn flex-shrink-0"
+>
+  {staticContent.readMore}
+  <svg
+    className="w-3.5 h-3.5 transform group-hover/btn:translate-x-0.5 transition-transform"
+    fill="none"
+    stroke="currentColor"
+    viewBox="0 0 24 24"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth="2"
+      d="M9 5l7 7-7 7"
+    />
+  </svg>
+</Link>
                 </div>
               </div>
             </article>
