@@ -109,8 +109,9 @@ export async function POST(request) {
       const filename = `content/${Date.now()}-${safeName}`;
 
       const blob = await put(filename, image, {
-        access: "public",
-      });
+  access: "public",
+  storeId: process.env.MEDIA_STORE_ID,
+});
 
       finalImage = blob.url;
 
@@ -214,9 +215,10 @@ export async function PUT(request) {
 
       const filename = `content/${Date.now()}-${safeName}`;
 
-      const blob = await put(filename, image, {
-        access: "public",
-      });
+       const blob = await put(filename, image, {
+  access: "public",
+  storeId: process.env.MEDIA_STORE_ID,
+});
 
       finalImage = blob.url;
 
