@@ -1,15 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import toast, { Toaster } from "react-hot-toast";
+
 import {
   Home,
   Search,
   Plus,
   Loader2,
-  Upload,
   Menu,
   X,
   RefreshCw,
@@ -17,20 +16,43 @@ import {
   Pencil,
   Trash2,
   ExternalLink,
+  Image as ImageIcon,
 } from "lucide-react";
 
+// =========================================================
+// SEPARATE FORM COMPONENTS
+// =========================================================
+
+import NavbarRunningStats from "./components/NavbarRunningStats";
+import FreeLearningResources from "./components/FreeLearningResources";
+import FeaturedWorks from "./components/FeaturedWorks";
+import LatestBlogs from "./components/LatestBlogs";
+
 export default function AdminPage() {
+  // =========================================================
+  // STATES
+  // =========================================================
+
   const [contents, setContents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState(null);
+
   const [deleteModal, setDeleteModal] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
+
   const [editingId, setEditingId] = useState(null);
   const [currentTime, setCurrentTime] = useState("");
   const [mobileMenu, setMobileMenu] = useState(false);
+
+  const [imagePreview, setImagePreview] = useState("");
+  const [imageError, setImageError] = useState(false);
+
+  const fileInputRef = useRef(null);
+  const objectUrlRef = useRef(null);
 
   const [form, setForm] = useState({
     section: "stats",
@@ -43,11 +65,18 @@ export default function AdminPage() {
     numberValue: "",
   });
 
-  const [imagePreview, setImagePreview] = useState("");
+  // =========================================================
+  // TIME
+  // =========================================================
 
   useEffect(() => {
     const updateTime = () => {
-      setCurrentTime(new Date().toLocaleString());
+      setCurrentTime(
+        new Date().toLocaleString("en-US", {
+          dateStyle: "medium",
+          timeStyle: "short",
+        })
+      );
     };
 
     updateTime();
@@ -57,13 +86,41 @@ export default function AdminPage() {
     return () => clearInterval(timer);
   }, []);
 
+  // =========================================================
+  // CLEAN OBJECT URL
+  // =========================================================
+
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) {
+        URL.revokeObjectURL(objectUrlRef.current);
+      }
+    };
+  }, []);
+
+  // =========================================================
+  // STATS
+  // =========================================================
+
   const stats = useMemo(() => {
     return {
       total: contents.length,
-      resources: contents.filter((i) => i.section === "resources").length,
-      blogs: contents.filter((i) => i.section === "blogs").length,
-      works: contents.filter((i) => i.section === "works").length,
-      stats: contents.filter((i) => i.section === "stats").length,
+
+      resources: contents.filter(
+        (item) => item.section === "resources"
+      ).length,
+
+      blogs: contents.filter(
+        (item) => item.section === "blogs"
+      ).length,
+
+      works: contents.filter(
+        (item) => item.section === "works"
+      ).length,
+
+      stats: contents.filter(
+        (item) => item.section === "stats"
+      ).length,
     };
   }, [contents]);
 
@@ -99,7 +156,7 @@ export default function AdminPage() {
     }
 
     const timer = setInterval(() => {
-      current++;
+      current += 1;
 
       setAnimatedStats({
         total: Math.min(current, stats.total),
@@ -112,28 +169,48 @@ export default function AdminPage() {
       if (current >= maxValue) {
         clearInterval(timer);
       }
-    }, 40);
+    }, 35);
 
     return () => clearInterval(timer);
   }, [stats]);
 
-  async function loadData() {
+  // =========================================================
+  // LOAD DATA
+  // =========================================================
+
+  async function loadData(showToast = false) {
     setLoading(true);
 
     try {
       const res = await fetch("/api/content", {
+        method: "GET",
         cache: "no-store",
       });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error: ${res.status}`);
+      }
 
       const data = await res.json();
 
       if (data.success) {
-        setContents(Array.isArray(data.data) ? data.data : []);
+        const items = Array.isArray(data.data)
+          ? data.data
+          : [];
+
+        setContents(items);
+
+        if (showToast) {
+          toast.success("Dashboard refreshed");
+        }
       } else {
-        toast.error(data.error || "Failed to load contents");
+        toast.error(
+          data.error || "Failed to load contents"
+        );
       }
-    } catch (err) {
-      console.error(err);
+    } catch (error) {
+      console.error("LOAD DATA ERROR:", error);
+
       toast.error("Failed to load contents");
     } finally {
       setLoading(false);
@@ -144,9 +221,20 @@ export default function AdminPage() {
     loadData();
   }, []);
 
-  function resetForm() {
+  // =========================================================
+  // RESET FORM
+  // =========================================================
+
+  function resetForm(scroll = true) {
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(objectUrlRef.current);
+      objectUrlRef.current = null;
+    }
+
     setEditingId(null);
+
     setImagePreview("");
+    setImageError(false);
 
     setForm({
       section: "stats",
@@ -159,83 +247,150 @@ export default function AdminPage() {
       numberValue: "",
     });
 
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+
+    if (scroll) {
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    }
   }
 
+  // =========================================================
+  // FORM VALIDATION
+  // =========================================================
+
   function validateForm() {
-    if (!form.title.trim()) {
+    const title = form.title.trim();
+
+    if (!title) {
       toast.error("Title is required");
       return false;
     }
 
-    if (form.title.trim().length < 3) {
+    if (title.length < 3) {
       toast.error("Title must be at least 3 characters");
       return false;
     }
 
     if (
-      form.section !== "stats" &&
-      form.section !== "blogs" &&
-      form.subtitle &&
-      form.subtitle.length < 5
+      (form.section === "works" ||
+        form.section === "resources") &&
+      !form.subtitle.trim()
     ) {
-      toast.error("Subtitle must be at least 5 characters");
+      toast.error("Description is required");
       return false;
     }
 
-    if (form.link) {
+    if (
+      (form.section === "works" ||
+        form.section === "resources") &&
+      form.subtitle.trim().length < 5
+    ) {
+      toast.error(
+        "Description must be at least 5 characters"
+      );
+      return false;
+    }
+
+    if (form.link.trim()) {
       try {
-        new URL(form.link);
+        new URL(form.link.trim());
       } catch {
-        toast.error("Invalid Website URL");
+        toast.error("Invalid Website / Google Drive URL");
         return false;
       }
     }
 
-    if (form.imageUrl) {
+    if (form.imageUrl.trim()) {
       try {
-        new URL(form.imageUrl);
+        new URL(form.imageUrl.trim());
       } catch {
         toast.error("Invalid Image URL");
         return false;
       }
     }
 
+    if (
+      form.section === "works" &&
+      !form.category.trim()
+    ) {
+      toast.error("Category is required for works");
+      return false;
+    }
+
+    if (
+      form.section === "blogs" &&
+      !form.category.trim()
+    ) {
+      toast.error("Category is required for blogs");
+      return false;
+    }
+
     return true;
   }
 
+  // =========================================================
+  // DUPLICATE TITLE
+  // =========================================================
+
   function isDuplicateTitle() {
+    const currentTitle = form.title
+      .trim()
+      .toLowerCase();
+
     return contents.some(
       (item) =>
         item.title?.trim().toLowerCase() ===
-          form.title.trim().toLowerCase() &&
+          currentTitle &&
         item._id !== editingId
     );
   }
 
+  // =========================================================
+  // FILTER
+  // =========================================================
+
   const filteredContents = useMemo(() => {
-    const searchValue = search.toLowerCase().trim();
+    const searchValue = search
+      .toLowerCase()
+      .trim();
 
     return contents.filter((item) => {
       const matchSearch =
         !searchValue ||
-        item.title?.toLowerCase().includes(searchValue) ||
-        item.subtitle?.toLowerCase().includes(searchValue) ||
-        item.category?.toLowerCase().includes(searchValue) ||
-        item.section?.toLowerCase().includes(searchValue);
+        item.title
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        item.subtitle
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        item.category
+          ?.toLowerCase()
+          .includes(searchValue) ||
+        item.section
+          ?.toLowerCase()
+          .includes(searchValue);
 
       const matchSection =
-        filter === "all" || item.section === filter;
+        filter === "all" ||
+        item.section === filter;
 
       return matchSearch && matchSection;
     });
   }, [contents, search, filter]);
 
+  // =========================================================
+  // ADD / UPDATE CONTENT
+  // =========================================================
+
   async function addContent(e) {
     e.preventDefault();
+
+    if (saving) return;
 
     if (!validateForm()) return;
 
@@ -249,104 +404,384 @@ export default function AdminPage() {
     try {
       const formData = new FormData();
 
-      formData.append("section", form.section);
-      formData.append("title", form.title);
-      formData.append("subtitle", form.subtitle);
-      formData.append("category", form.category);
-      formData.append("link", form.link);
-      formData.append("numberValue", form.numberValue);
+      formData.append(
+        "section",
+        form.section
+      );
 
-      if (form.imageUrl) {
-        formData.append("imageUrl", form.imageUrl);
+      formData.append(
+        "title",
+        form.title.trim()
+      );
+
+      formData.append(
+        "subtitle",
+        form.subtitle.trim()
+      );
+
+      formData.append(
+        "category",
+        form.category.trim()
+      );
+
+      formData.append(
+        "link",
+        form.link.trim()
+      );
+
+      formData.append(
+        "numberValue",
+        form.numberValue.trim()
+      );
+
+      if (form.imageUrl.trim()) {
+        formData.append(
+          "imageUrl",
+          form.imageUrl.trim()
+        );
       }
 
       if (editingId) {
-        formData.append("id", editingId);
+        formData.append(
+          "id",
+          editingId
+        );
       }
 
       if (form.image instanceof File) {
-        formData.append("image", form.image);
+        formData.append(
+          "image",
+          form.image
+        );
       }
 
-      const endpoint = "/api/content";
-      const method = editingId ? "PUT" : "POST";
+      const method = editingId
+        ? "PUT"
+        : "POST";
 
-      const res = await fetch(endpoint, {
-        method,
-        body: formData,
-      });
+      const res = await fetch(
+        "/api/content",
+        {
+          method,
+          body: formData,
+        }
+      );
 
       const data = await res.json();
 
-      if (data.success) {
-        toast.success(
-          editingId
-            ? "Content Updated Successfully"
-            : "Content Added Successfully"
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.error ||
+            "Something went wrong"
         );
-
-        resetForm();
-        await loadData();
-      } else {
-        toast.error(data.error || "Something went wrong");
       }
-    } catch (err) {
-      console.error(err);
-      toast.error("Server Error");
+
+      toast.success(
+        editingId
+          ? "Content updated successfully"
+          : "Content added successfully"
+      );
+
+      resetForm(false);
+
+      await loadData();
+
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth",
+      });
+    } catch (error) {
+      console.error(
+        "SAVE CONTENT ERROR:",
+        error
+      );
+
+      toast.error(
+        error.message ||
+          "Server error"
+      );
     } finally {
       setSaving(false);
     }
   }
 
+  // =========================================================
+  // DELETE
+  // =========================================================
+
   async function deleteItem(id) {
-    if (!id) return;
+    if (!id || deletingId) return;
 
     setDeletingId(id);
 
     try {
-      const res = await fetch(`/api/content?id=${id}`, {
-        method: "DELETE",
-      });
+      const res = await fetch(
+        `/api/content?id=${encodeURIComponent(id)}`,
+        {
+          method: "DELETE",
+        }
+      );
 
       const data = await res.json();
 
-      if (data.success) {
-        toast.success("Deleted Successfully");
-        await loadData();
-      } else {
-        toast.error(data.error || "Something went wrong");
+      if (!res.ok || !data.success) {
+        throw new Error(
+          data.error ||
+            "Delete failed"
+        );
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Delete Failed");
-    } finally {
-      setDeletingId(null);
+
+      toast.success(
+        "Content deleted successfully"
+      );
+
+      setContents((prev) =>
+        prev.filter(
+          (item) => item._id !== id
+        )
+      );
+
       setDeleteModal(false);
       setSelectedId(null);
+    } catch (error) {
+      console.error(
+        "DELETE ERROR:",
+        error
+      );
+
+      toast.error(
+        error.message ||
+          "Delete failed"
+      );
+    } finally {
+      setDeletingId(null);
     }
   }
 
+  // =========================================================
+  // EDIT
+  // =========================================================
+
   function editItem(item) {
+    if (!item) return;
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(
+        objectUrlRef.current
+      );
+
+      objectUrlRef.current = null;
+    }
+
     setEditingId(item._id);
 
-    setImagePreview(item.image || "");
+    const existingImage =
+      item.image || "";
+
+    setImagePreview(existingImage);
+    setImageError(false);
 
     setForm({
-      section: item.section || "stats",
-      title: item.title || "",
-      subtitle: item.subtitle || "",
-      category: item.category || "",
-      link: item.link || "",
+      section:
+        item.section || "stats",
+
+      title:
+        item.title || "",
+
+      subtitle:
+        item.subtitle || "",
+
+      category:
+        item.category || "",
+
+      link:
+        item.link || "",
+
       image: null,
-      imageUrl: item.image?.startsWith("http") ? item.image : "",
-      numberValue: item.numberValue || "",
+
+      imageUrl:
+        existingImage.startsWith(
+          "http://"
+        ) ||
+        existingImage.startsWith(
+          "https://"
+        )
+          ? existingImage
+          : "",
+
+      numberValue:
+        item.numberValue || "",
     });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
 
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
   }
+
+  // =========================================================
+  // IMAGE URL HANDLER
+  // =========================================================
+
+  function handleImageUrlChange(value) {
+    setImageError(false);
+
+    setForm((prev) => ({
+      ...prev,
+      imageUrl: value,
+      image: null,
+    }));
+
+    setImagePreview(value);
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(
+        objectUrlRef.current
+      );
+
+      objectUrlRef.current = null;
+    }
+  }
+
+  // =========================================================
+  // FILE HANDLER
+  // =========================================================
+
+  function handleFileChange(e) {
+    const file =
+      e.target.files?.[0];
+
+    if (!file) return;
+
+    setImageError(false);
+
+    if (!file.type.startsWith("image/")) {
+      toast.error(
+        "Please select a valid image file"
+      );
+
+      e.target.value = "";
+
+      return;
+    }
+
+    if (
+      file.size >
+      5 * 1024 * 1024
+    ) {
+      toast.error(
+        "Image must be 5MB or smaller"
+      );
+
+      e.target.value = "";
+
+      return;
+    }
+
+    if (objectUrlRef.current) {
+      URL.revokeObjectURL(
+        objectUrlRef.current
+      );
+    }
+
+    const objectUrl =
+      URL.createObjectURL(file);
+
+    objectUrlRef.current =
+      objectUrl;
+
+    setForm((prev) => ({
+      ...prev,
+      image: file,
+      imageUrl: "",
+    }));
+
+    setImagePreview(objectUrl);
+  }
+
+  // =========================================================
+  // IMAGE URL NORMALIZER
+  // =========================================================
+
+  function getImageSrc(image) {
+    if (!image) return "";
+
+    const value =
+      String(image).trim();
+
+    if (!value) return "";
+
+    if (
+      value.startsWith("http://") ||
+      value.startsWith("https://") ||
+      value.startsWith("blob:") ||
+      value.startsWith("data:")
+    ) {
+      return value;
+    }
+
+    if (value.startsWith("/")) {
+      return encodeURI(value);
+    }
+
+    return encodeURI(`/${value}`);
+  }
+
+  // =========================================================
+  // LOGOUT
+  // =========================================================
+
+  function logout() {
+    localStorage.removeItem(
+      "isAdminLoggedIn"
+    );
+
+    window.location.href =
+      "/admin/login";
+  }
+
+  // =========================================================
+  // CLOSE DELETE MODAL
+  // =========================================================
+
+  function closeDeleteModal() {
+    if (deletingId) return;
+
+    setDeleteModal(false);
+    setSelectedId(null);
+  }
+
+  // =========================================================
+  // RECENT CONTENTS
+  // =========================================================
+
+  const recentContents = useMemo(() => {
+    return [...contents]
+      .sort((a, b) => {
+        const dateA = a.createdAt
+          ? new Date(
+              a.createdAt
+            ).getTime()
+          : 0;
+
+        const dateB = b.createdAt
+          ? new Date(
+              b.createdAt
+            ).getTime()
+          : 0;
+
+        return dateB - dateA;
+      })
+      .slice(0, 5);
+  }, [contents]);
+
+  // =========================================================
+  // RENDER
+  // =========================================================
 
   return (
     <>
@@ -358,28 +793,41 @@ export default function AdminPage() {
           style: {
             background: "#18181b",
             color: "#fff",
-            border: "1px solid #3f3f46",
+            border:
+              "1px solid #3f3f46",
           },
         }}
       />
 
       <div className="min-h-screen bg-zinc-950 text-white overflow-x-hidden">
-        {/* ================= HEADER ================= */}
+
+        {/* =================================================
+            HEADER
+        ================================================= */}
+
         <header className="sticky top-0 z-40 bg-zinc-950/90 backdrop-blur-xl border-b border-zinc-800">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
             <div className="min-h-[76px] flex items-center justify-between gap-4">
+
               <div className="min-w-0">
+
                 <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black text-white truncate">
                   Zyntrix CMS
                 </h1>
 
                 <p className="hidden sm:block text-xs sm:text-sm text-zinc-400 mt-1">
-                  Manage your website contents, blogs, resources & works
+                  Manage your website
+                  contents, blogs,
+                  resources & works
                 </p>
+
               </div>
 
-              {/* Desktop Navigation */}
+              {/* DESKTOP NAV */}
+
               <div className="hidden md:flex items-center gap-3">
+
                 <Link
                   href="/"
                   className="bg-zinc-800 hover:bg-zinc-700 px-4 lg:px-5 py-2.5 rounded-xl flex items-center gap-2 transition-colors text-sm font-medium"
@@ -389,44 +837,68 @@ export default function AdminPage() {
                 </Link>
 
                 <button
-                  onClick={loadData}
-                  className="bg-zinc-800 hover:bg-zinc-700 px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors text-sm font-medium"
+                  type="button"
+                  onClick={() =>
+                    loadData(true)
+                  }
+                  disabled={loading}
+                  className="bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors text-sm font-medium"
                 >
                   <RefreshCw
                     size={17}
-                    className={loading ? "animate-spin" : ""}
+                    className={
+                      loading
+                        ? "animate-spin"
+                        : ""
+                    }
                   />
+
                   Refresh
                 </button>
 
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("isAdminLoggedIn");
-                    window.location.href = "/admin/login";
-                  }}
+                  type="button"
+                  onClick={logout}
                   className="bg-red-600/90 hover:bg-red-600 px-4 py-2.5 rounded-xl flex items-center gap-2 transition-colors text-sm font-medium"
                 >
                   <LogOut size={17} />
+
                   Logout
                 </button>
+
               </div>
 
-              {/* Mobile Menu Button */}
+              {/* MOBILE BUTTON */}
+
               <button
-                onClick={() => setMobileMenu(!mobileMenu)}
+                type="button"
+                onClick={() =>
+                  setMobileMenu(
+                    (prev) => !prev
+                  )
+                }
                 className="md:hidden w-11 h-11 rounded-xl bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center"
                 aria-label="Toggle menu"
               >
-                {mobileMenu ? <X size={21} /> : <Menu size={21} />}
+                {mobileMenu ? (
+                  <X size={21} />
+                ) : (
+                  <Menu size={21} />
+                )}
               </button>
+
             </div>
 
-            {/* Mobile Menu */}
+            {/* MOBILE MENU */}
+
             {mobileMenu && (
               <div className="md:hidden border-t border-zinc-800 py-4 space-y-2">
+
                 <Link
                   href="/"
-                  onClick={() => setMobileMenu(false)}
+                  onClick={() =>
+                    setMobileMenu(false)
+                  }
                   className="w-full bg-zinc-800 hover:bg-zinc-700 px-4 py-3 rounded-xl flex items-center gap-2"
                 >
                   <Home size={18} />
@@ -434,8 +906,9 @@ export default function AdminPage() {
                 </Link>
 
                 <button
+                  type="button"
                   onClick={() => {
-                    loadData();
+                    loadData(true);
                     setMobileMenu(false);
                   }}
                   className="w-full bg-zinc-800 hover:bg-zinc-700 px-4 py-3 rounded-xl flex items-center gap-2"
@@ -445,56 +918,83 @@ export default function AdminPage() {
                 </button>
 
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("isAdminLoggedIn");
-                    window.location.href = "/admin/login";
-                  }}
+                  type="button"
+                  onClick={logout}
                   className="w-full bg-red-600 hover:bg-red-500 px-4 py-3 rounded-xl flex items-center gap-2"
                 >
                   <LogOut size={18} />
                   Logout
                 </button>
+
               </div>
             )}
+
           </div>
         </header>
 
+        {/* =================================================
+            MAIN
+        ================================================= */}
+
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
-          {/* ================= TOP INFO ================= */}
+
+          {/* TOP INFO */}
+
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5 mb-7 sm:mb-10">
+
             <div>
+
               <p className="text-zinc-500 text-sm">
-                Content Management Dashboard
+                Content Management
+                Dashboard
               </p>
 
               <h2 className="text-xl sm:text-2xl font-bold text-white mt-1">
-                Manage Everything From One Place
+                Manage Everything
+                From One Place
               </h2>
+
             </div>
 
             <div className="flex flex-wrap gap-3">
+
               <div className="flex-1 min-w-[145px] sm:flex-none bg-emerald-500/10 border border-emerald-500/30 rounded-xl px-4 py-3">
-                <p className="text-[11px] text-zinc-400">Growth</p>
+
+                <p className="text-[11px] text-zinc-400">
+                  Growth
+                </p>
+
                 <h3 className="text-xl font-black text-emerald-400">
                   +24%
                 </h3>
+
               </div>
 
               <div className="flex-1 min-w-[190px] sm:flex-none bg-blue-500/10 border border-blue-500/30 rounded-xl px-4 py-3">
+
                 <p className="text-[11px] text-zinc-400">
                   Last Updated
                 </p>
 
                 <h3 className="text-xs sm:text-sm font-bold text-white mt-1 break-words">
-                  {currentTime || "Loading..."}
+                  {currentTime ||
+                    "Loading..."}
                 </h3>
+
               </div>
+
             </div>
+
           </div>
 
-          {/* ================= STATS ================= */}
+          {/* =================================================
+              DASHBOARD STATS
+          ================================================= */}
+
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-5 mb-7 sm:mb-10">
+
             <div className="rounded-2xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white p-4 sm:p-6 shadow-lg">
+
               <p className="text-xs sm:text-sm opacity-80">
                 Total Contents
               </p>
@@ -502,9 +1002,11 @@ export default function AdminPage() {
               <h2 className="text-2xl sm:text-4xl font-black mt-1 sm:mt-2">
                 {animatedStats.total}
               </h2>
+
             </div>
 
             <div className="rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 sm:p-6 shadow-lg">
+
               <p className="text-xs sm:text-sm opacity-80">
                 Resources
               </p>
@@ -512,9 +1014,11 @@ export default function AdminPage() {
               <h2 className="text-2xl sm:text-4xl font-black mt-1 sm:mt-2">
                 {animatedStats.resources}
               </h2>
+
             </div>
 
             <div className="rounded-2xl bg-gradient-to-r from-violet-600 to-purple-700 text-white p-4 sm:p-6 shadow-lg">
+
               <p className="text-xs sm:text-sm opacity-80">
                 Blogs
               </p>
@@ -522,9 +1026,11 @@ export default function AdminPage() {
               <h2 className="text-2xl sm:text-4xl font-black mt-1 sm:mt-2">
                 {animatedStats.blogs}
               </h2>
+
             </div>
 
             <div className="rounded-2xl bg-gradient-to-r from-orange-500 to-red-500 text-white p-4 sm:p-6 shadow-lg">
+
               <p className="text-xs sm:text-sm opacity-80">
                 Featured Works
               </p>
@@ -532,9 +1038,11 @@ export default function AdminPage() {
               <h2 className="text-2xl sm:text-4xl font-black mt-1 sm:mt-2">
                 {animatedStats.works}
               </h2>
+
             </div>
 
             <div className="rounded-2xl bg-gradient-to-r from-pink-600 to-fuchsia-700 text-white p-4 sm:p-6 shadow-lg col-span-2 lg:col-span-1">
+
               <p className="text-xs sm:text-sm opacity-80">
                 Running Stats
               </p>
@@ -542,13 +1050,23 @@ export default function AdminPage() {
               <h2 className="text-2xl sm:text-4xl font-black mt-1 sm:mt-2">
                 {animatedStats.stats}
               </h2>
+
             </div>
+
           </div>
 
-          {/* ================= RECENT + QUICK ACTION ================= */}
+          {/* =================================================
+              RECENT + QUICK ACTION
+          ================================================= */}
+
           <div className="grid lg:grid-cols-3 gap-5 sm:gap-6 mb-7 sm:mb-10">
+
+            {/* RECENT */}
+
             <div className="lg:col-span-2 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6">
+
               <div className="flex items-center justify-between gap-3 mb-5">
+
                 <h2 className="text-lg sm:text-xl font-bold">
                   Recent Activity
                 </h2>
@@ -556,22 +1074,20 @@ export default function AdminPage() {
                 <span className="text-xs text-zinc-500">
                   {contents.length} total
                 </span>
+
               </div>
 
               <div className="space-y-3">
-                {[...contents]
-                  .sort(
-                    (a, b) =>
-                      new Date(b.createdAt) -
-                      new Date(a.createdAt)
-                  )
-                  .slice(0, 5)
-                  .map((item) => (
+
+                {recentContents.map(
+                  (item) => (
                     <div
                       key={item._id}
                       className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-zinc-800 pb-3"
                     >
+
                       <div className="min-w-0">
+
                         <h3 className="text-white font-semibold truncate">
                           {item.title}
                         </h3>
@@ -579,6 +1095,7 @@ export default function AdminPage() {
                         <p className="text-zinc-400 text-xs sm:text-sm capitalize">
                           {item.section}
                         </p>
+
                       </div>
 
                       <span className="text-xs text-zinc-500 shrink-0">
@@ -588,63 +1105,92 @@ export default function AdminPage() {
                             ).toLocaleDateString()
                           : "Recent"}
                       </span>
+
                     </div>
-                  ))}
+                  )
+                )}
 
                 {contents.length === 0 && (
                   <p className="text-zinc-500 text-sm py-5 text-center">
                     No activity yet.
                   </p>
                 )}
+
               </div>
+
             </div>
 
+            {/* QUICK ACTION */}
+
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-6">
+
               <h2 className="text-lg sm:text-xl font-bold mb-5">
                 Quick Actions
               </h2>
 
               <div className="grid sm:grid-cols-3 lg:grid-cols-1 gap-3">
+
                 <button
-                  onClick={resetForm}
-                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white cursor-pointer transition-colors flex items-center justify-center gap-2 font-medium"
+                  type="button"
+                  onClick={() =>
+                    resetForm(true)
+                  }
+                  className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <Plus size={18} />
                   New Content
                 </button>
 
                 <button
-                  onClick={loadData}
-                  className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white cursor-pointer transition-colors flex items-center justify-center gap-2 font-medium"
+                  type="button"
+                  onClick={() =>
+                    loadData(true)
+                  }
+                  disabled={loading}
+                  className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 disabled:opacity-50 text-white transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <RefreshCw
                     size={17}
-                    className={loading ? "animate-spin" : ""}
+                    className={
+                      loading
+                        ? "animate-spin"
+                        : ""
+                    }
                   />
+
                   Refresh
                 </button>
 
                 <button
-                  onClick={() => {
-                    localStorage.removeItem("isAdminLoggedIn");
-                    window.location.href = "/admin/login";
-                  }}
-                  className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white cursor-pointer transition-colors flex items-center justify-center gap-2 font-medium"
+                  type="button"
+                  onClick={logout}
+                  className="w-full py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white transition-colors flex items-center justify-center gap-2 font-medium"
                 >
                   <LogOut size={17} />
                   Logout
                 </button>
+
               </div>
+
             </div>
+
           </div>
 
-          {/* ================= FORM ================= */}
+          {/* =================================================
+              FORM
+          ================================================= */}
+
           <form
             onSubmit={addContent}
             className="bg-zinc-900 border border-zinc-800 shadow-xl rounded-2xl p-4 sm:p-6 lg:p-8 space-y-5 sm:space-y-6 mb-10 sm:mb-12"
           >
+
+            {/* FORM HEADER */}
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+
               <div>
+
                 <h2 className="text-xl sm:text-2xl font-bold text-white">
                   {editingId
                     ? "Edit Content"
@@ -652,8 +1198,10 @@ export default function AdminPage() {
                 </h2>
 
                 <p className="text-xs sm:text-sm text-zinc-500 mt-1">
-                  Add or update website content from here.
+                  Add or update website
+                  content from here.
                 </p>
+
               </div>
 
               {editingId && (
@@ -661,10 +1209,15 @@ export default function AdminPage() {
                   Editing Mode
                 </span>
               )}
+
             </div>
 
-            {/* SECTION */}
+            {/* =================================================
+                SECTION SELECT
+            ================================================= */}
+
             <div>
+
               <label className="font-semibold text-zinc-300 text-sm">
                 Section
               </label>
@@ -673,305 +1226,251 @@ export default function AdminPage() {
                 required
                 className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full mt-2 text-white focus:outline-none focus:border-blue-500"
                 value={form.section}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    section: e.target.value,
+                onChange={(e) => {
+
+                  const value =
+                    e.target.value;
+
+                  setForm((prev) => ({
+                    ...prev,
+
+                    section: value,
+
                     category:
-                      e.target.value === "works"
+                      value === "works"
                         ? "UI/UX Design"
                         : "",
-                  })
-                }
+
+                    subtitle:
+                      value === "stats" ||
+                      value === "blogs"
+                        ? ""
+                        : prev.subtitle,
+
+                    link:
+                      value === "stats"
+                        ? ""
+                        : prev.link,
+
+                    image:
+                      value === "stats"
+                        ? null
+                        : prev.image,
+
+                    imageUrl:
+                      value === "stats"
+                        ? ""
+                        : prev.imageUrl,
+
+                    numberValue:
+                      value === "stats"
+                        ? prev.numberValue
+                        : "",
+                  }));
+
+                  if (
+                    value === "stats"
+                  ) {
+                    setImagePreview("");
+                  }
+
+                }}
               >
+
                 <option value="stats">
                   Navbar Running Stats
                 </option>
+
                 <option value="resources">
                   Free Learning Resources
                 </option>
+
                 <option value="works">
                   Featured Works
                 </option>
+
                 <option value="blogs">
                   Latest Blogs
                 </option>
+
               </select>
+
             </div>
 
-            {/* CATEGORY */}
+            {/* =================================================
+                SECTION COMPONENT
+            ================================================= */}
+
+            {form.section === "stats" && (
+              <NavbarRunningStats
+                form={form}
+                setForm={setForm}
+              />
+            )}
+
+            {form.section === "resources" && (
+              <FreeLearningResources
+                form={form}
+                setForm={setForm}
+
+                imagePreview={
+                  imagePreview
+                }
+
+                setImagePreview={
+                  setImagePreview
+                }
+
+                imageError={
+                  imageError
+                }
+
+                setImageError={
+                  setImageError
+                }
+
+                fileInputRef={
+                  fileInputRef
+                }
+
+                objectUrlRef={
+                  objectUrlRef
+                }
+
+                handleImageUrlChange={
+                  handleImageUrlChange
+                }
+
+                handleFileChange={
+                  handleFileChange
+                }
+
+                getImageSrc={
+                  getImageSrc
+                }
+
+                editingId={
+                  editingId
+                }
+              />
+            )}
+
             {form.section === "works" && (
-              <div>
-                <label className="font-semibold text-zinc-300 text-sm">
-                  Category
-                </label>
+              <FeaturedWorks
+                form={form}
+                setForm={setForm}
 
-                <select
-                  required
-                  className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full mt-2 text-white focus:outline-none focus:border-blue-500"
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      category: e.target.value,
-                    })
-                  }
-                >
-                  <option value="UI/UX Design">
-                    UI/UX Design
-                  </option>
+                imagePreview={
+                  imagePreview
+                }
 
-                  <option value="Web Design">
-                    Web Design
-                  </option>
-                </select>
-              </div>
+                setImagePreview={
+                  setImagePreview
+                }
+
+                imageError={
+                  imageError
+                }
+
+                setImageError={
+                  setImageError
+                }
+
+                fileInputRef={
+                  fileInputRef
+                }
+
+                objectUrlRef={
+                  objectUrlRef
+                }
+
+                handleImageUrlChange={
+                  handleImageUrlChange
+                }
+
+                handleFileChange={
+                  handleFileChange
+                }
+
+                getImageSrc={
+                  getImageSrc
+                }
+
+                editingId={
+                  editingId
+                }
+              />
             )}
 
             {form.section === "blogs" && (
-              <div>
-                <label className="font-semibold text-zinc-300 text-sm">
-                  Category
-                </label>
+              <LatestBlogs
+                form={form}
+                setForm={setForm}
 
-                <input
-                  required
-                  className="bg-white border p-3.5 rounded-xl w-full mt-2 text-zinc-900 focus:outline-none focus:border-blue-500"
-                  placeholder="e.g. Development, Tech"
-                  value={form.category}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      category: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            )}
-
-            {/* TITLE */}
-            <div>
-              <label className="font-semibold text-zinc-300 text-sm">
-                Title
-              </label>
-
-              <input
-                required
-                className={`border p-3.5 rounded-xl w-full mt-2 text-zinc-900 bg-white focus:outline-none focus:border-blue-500 ${
-                  !form.title
-                    ? "border-red-400"
-                    : "border-zinc-300"
-                }`}
-                placeholder={
-                  form.section === "stats"
-                    ? "Enter Stat Title"
-                    : "Enter Content Title"
+                imagePreview={
+                  imagePreview
                 }
-                value={form.title}
-                onChange={(e) =>
-                  setForm({
-                    ...form,
-                    title: e.target.value,
-                  })
+
+                setImagePreview={
+                  setImagePreview
+                }
+
+                imageError={
+                  imageError
+                }
+
+                setImageError={
+                  setImageError
+                }
+
+                fileInputRef={
+                  fileInputRef
+                }
+
+                objectUrlRef={
+                  objectUrlRef
+                }
+
+                handleImageUrlChange={
+                  handleImageUrlChange
+                }
+
+                handleFileChange={
+                  handleFileChange
+                }
+
+                getImageSrc={
+                  getImageSrc
+                }
+
+                editingId={
+                  editingId
                 }
               />
-            </div>
-
-            {/* SUBTITLE */}
-            {(form.section === "works" ||
-              form.section === "resources") && (
-              <div>
-                <label className="font-semibold text-zinc-300 text-sm">
-                  Subtitle / Description
-                </label>
-
-                <textarea
-                  required
-                  rows={4}
-                  maxLength={500}
-                  className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full mt-2 text-white focus:outline-none focus:border-blue-500 resize-y"
-                  placeholder="Write description..."
-                  value={form.subtitle}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      subtitle: e.target.value,
-                    })
-                  }
-                />
-
-                <div className="text-right text-xs text-zinc-500 mt-1">
-                  {form.subtitle.length}/500
-                </div>
-              </div>
             )}
 
-            {/* LINK */}
-            {form.section !== "stats" && (
-              <div>
-                <label className="font-semibold text-zinc-300 text-sm">
-                  Google Drive / Website Link
-                </label>
+            {/* =================================================
+                BUTTONS
+            ================================================= */}
 
-                <input
-                  type="url"
-                  className="border p-3.5 rounded-xl w-full mt-2 text-zinc-900 bg-white focus:outline-none focus:border-blue-500"
-                  placeholder="https://example.com"
-                  value={form.link}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      link: e.target.value,
-                    })
-                  }
-                />
-
-                <p className="text-xs text-zinc-500 mt-2">
-                  This link will open when visitors click the
-                  content.
-                </p>
-              </div>
-            )}
-
-            {/* IMAGE */}
-            {form.section !== "stats" && (
-              <div className="space-y-4">
-                <label className="font-semibold text-zinc-300 text-sm block">
-                  Image Source
-                </label>
-
-                {/* IMAGE URL */}
-                <div>
-                  <input
-                    type="url"
-                    className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full text-white focus:outline-none focus:border-blue-500"
-                    placeholder="Paste direct Image URL (e.g. Cloudinary link)"
-                    value={form.imageUrl}
-                    onChange={(e) => {
-                      setForm({
-                        ...form,
-                        imageUrl: e.target.value,
-                        image: null,
-                      });
-
-                      setImagePreview(e.target.value);
-                    }}
-                  />
-
-                  <p className="text-xs text-zinc-500 mt-2">
-                    Use a public/direct image URL.
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-3">
-                  <div className="h-px bg-zinc-800 flex-1" />
-                  <span className="text-xs text-zinc-500">
-                    OR
-                  </span>
-                  <div className="h-px bg-zinc-800 flex-1" />
-                </div>
-
-                {/* FILE UPLOAD */}
-                <label className="flex flex-col items-center justify-center border-2 border-dashed border-zinc-700 bg-zinc-950 rounded-xl p-6 sm:p-8 cursor-pointer hover:border-blue-500 hover:bg-zinc-900 transition-colors text-center">
-                  <Upload
-                    className="text-zinc-400 mb-3"
-                    size={28}
-                  />
-
-                  <span className="text-sm text-zinc-300 font-medium">
-                    Click to browse or drag & drop image
-                  </span>
-
-                  <span className="text-xs text-zinc-500 mt-2">
-                    PNG, JPG, WEBP up to 5MB
-                  </span>
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-
-                      if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
-                          toast.error(
-                            "Image must be 5MB or smaller"
-                          );
-
-                          e.target.value = "";
-                          return;
-                        }
-
-                        setForm({
-                          ...form,
-                          image: file,
-                          imageUrl: "",
-                        });
-
-                        setImagePreview(
-                          URL.createObjectURL(file)
-                        );
-                      }
-                    }}
-                  />
-                </label>
-
-                {/* IMAGE PREVIEW */}
-                {imagePreview && (
-                  <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-4 w-full">
-                    <p className="font-semibold text-zinc-300 mb-3 text-sm">
-                      Image Preview
-                    </p>
-
-                    <div className="relative w-full max-w-md h-48 sm:h-56 overflow-hidden rounded-xl bg-zinc-950">
-                      <Image
-                        src={imagePreview}
-                        fill
-                        alt="Preview"
-                        className="rounded-xl object-cover"
-                        unoptimized
-                      />
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* NUMBER VALUE */}
-            {form.section === "stats" && (
-              <div>
-                <label className="font-semibold text-zinc-300 text-sm">
-                  Number Value
-                </label>
-
-                <input
-                  className="bg-zinc-950 border border-zinc-800 p-3.5 rounded-xl w-full mt-2 text-white focus:outline-none focus:border-blue-500"
-                  placeholder="500+"
-                  value={form.numberValue}
-                  onChange={(e) =>
-                    setForm({
-                      ...form,
-                      numberValue: e.target.value,
-                    })
-                  }
-                />
-              </div>
-            )}
-
-            {/* BUTTONS */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
+
               <button
                 type="submit"
-                disabled={saving || !form.title.trim()}
-                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white px-7 py-3.5 rounded-xl font-medium transition-colors cursor-pointer flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
+                disabled={
+                  saving ||
+                  !form.title.trim()
+                }
+                className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-700 disabled:text-zinc-500 text-white px-7 py-3.5 rounded-xl font-medium transition-colors cursor-pointer disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-blue-600/20"
               >
+
                 {saving ? (
                   <>
                     <Loader2
                       className="animate-spin"
                       size={18}
                     />
+
                     Saving...
                   </>
                 ) : (
@@ -987,23 +1486,34 @@ export default function AdminPage() {
                       : "Add Content"}
                   </>
                 )}
+
               </button>
 
               {editingId && (
                 <button
                   type="button"
-                  onClick={resetForm}
-                  className="w-full sm:w-auto bg-zinc-700 hover:bg-zinc-600 text-white px-7 py-3.5 rounded-xl font-medium transition-colors cursor-pointer"
+                  onClick={() =>
+                    resetForm(true)
+                  }
+                  disabled={saving}
+                  className="w-full sm:w-auto bg-zinc-700 hover:bg-zinc-600 disabled:opacity-50 text-white px-7 py-3.5 rounded-xl font-medium transition-colors cursor-pointer"
                 >
                   Cancel Edit
                 </button>
               )}
+
             </div>
+
           </form>
 
-          {/* ================= SEARCH + FILTER ================= */}
+          {/* =================================================
+              SEARCH + FILTER
+          ================================================= */}
+
           <div className="flex flex-col sm:flex-row gap-3 mb-7 sm:mb-8">
+
             <div className="relative flex-1">
+
               <Search
                 className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500"
                 size={18}
@@ -1011,216 +1521,439 @@ export default function AdminPage() {
 
               <input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) =>
+                  setSearch(
+                    e.target.value
+                  )
+                }
                 placeholder="Search title, category, section..."
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-xl pl-12 pr-4 py-3.5 text-white focus:outline-none focus:border-blue-500"
               />
+
             </div>
 
             <select
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) =>
+                setFilter(
+                  e.target.value
+                )
+              }
               className="w-full sm:w-auto bg-zinc-900 border border-zinc-800 rounded-xl px-5 py-3.5 text-white focus:outline-none focus:border-blue-500"
             >
-              <option value="all">All Contents</option>
-              <option value="stats">Stats</option>
-              <option value="resources">Resources</option>
-              <option value="works">Works</option>
-              <option value="blogs">Blogs</option>
+
+              <option value="all">
+                All Contents
+              </option>
+
+              <option value="stats">
+                Stats
+              </option>
+
+              <option value="resources">
+                Resources
+              </option>
+
+              <option value="works">
+                Works
+              </option>
+
+              <option value="blogs">
+                Blogs
+              </option>
+
             </select>
+
           </div>
 
-          {/* ================= EXISTING CONTENTS ================= */}
+          {/* =================================================
+              EXISTING CONTENTS
+          ================================================= */}
+
           <div className="mt-8 sm:mt-14">
+
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6 sm:mb-8">
+
               <h2 className="text-2xl sm:text-3xl font-bold">
                 Existing Contents
               </h2>
 
               <p className="text-xs sm:text-sm text-zinc-500">
-                Showing {filteredContents.length} of{" "}
-                {contents.length}
+                Showing{" "}
+                {
+                  filteredContents.length
+                }{" "}
+                of {contents.length}
               </p>
+
             </div>
+
+            {/* LOADING */}
 
             {loading ? (
               <div className="space-y-4">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-6"
-                  >
-                    <div className="h-6 w-56 bg-zinc-800 rounded mb-4" />
-                    <div className="h-4 w-full bg-zinc-800 rounded mb-2" />
-                    <div className="h-4 w-3/4 bg-zinc-800 rounded" />
-                  </div>
-                ))}
+
+                {[1, 2, 3].map(
+                  (i) => (
+                    <div
+                      key={i}
+                      className="animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900 p-5 sm:p-6"
+                    >
+
+                      <div className="h-6 w-56 bg-zinc-800 rounded mb-4" />
+
+                      <div className="h-4 w-full bg-zinc-800 rounded mb-2" />
+
+                      <div className="h-4 w-3/4 bg-zinc-800 rounded" />
+
+                    </div>
+                  )
+                )}
+
               </div>
+
             ) : filteredContents.length === 0 ? (
+
               <div className="text-zinc-500 text-center py-14 bg-zinc-900/50 rounded-2xl border border-zinc-800">
+
+                <Search
+                  className="mx-auto mb-3 opacity-50"
+                  size={32}
+                />
+
                 <p className="font-medium">
                   No Content Found
                 </p>
 
                 <p className="text-xs mt-2">
-                  Try changing your search or filter.
+                  Try changing your
+                  search or filter.
                 </p>
-              </div>
-            ) : (
-              <div className="grid gap-4 sm:gap-5">
-                {filteredContents.map((item) => (
-                  <div
-                    key={item._id}
-                    className="border border-zinc-800 rounded-2xl p-4 sm:p-6 bg-zinc-900 shadow-lg"
-                  >
-                    <div className="flex flex-col xl:flex-row xl:justify-between gap-6">
-                      {/* CONTENT INFORMATION */}
-                      <div className="space-y-2.5 text-zinc-300 min-w-0 flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                          <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 capitalize">
-                            {item.section}
-                          </span>
 
-                          {item.category && (
-                            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400">
-                              {item.category}
+              </div>
+
+            ) : (
+
+              <div className="grid gap-4 sm:gap-5">
+
+                {filteredContents.map(
+                  (item) => (
+
+                    <div
+                      key={item._id}
+                      className="border border-zinc-800 rounded-2xl p-4 sm:p-6 bg-zinc-900 shadow-lg"
+                    >
+
+                      <div className="flex flex-col xl:flex-row xl:justify-between gap-6">
+
+                        {/* CONTENT */}
+
+                        <div className="space-y-2.5 text-zinc-300 min-w-0 flex-1">
+
+                          {/* BADGES */}
+
+                          <div className="flex flex-wrap items-center gap-2 mb-3">
+
+                            <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 capitalize">
+                              {item.section ||
+                                "unknown"}
                             </span>
+
+                            {item.category && (
+                              <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-violet-500/10 border border-violet-500/20 text-violet-400">
+                                {
+                                  item.category
+                                }
+                              </span>
+                            )}
+
+                          </div>
+
+                          {/* TITLE */}
+
+                          <p className="break-words">
+
+                            <b className="text-white">
+                              Title:
+                            </b>{" "}
+
+                            {item.title ||
+                              "Untitled"}
+
+                          </p>
+
+                          {/* SUBTITLE */}
+
+                          {item.subtitle && (
+                            <p className="break-words leading-relaxed">
+
+                              <b className="text-white">
+                                Description:
+                              </b>{" "}
+
+                              {
+                                item.subtitle
+                              }
+
+                            </p>
                           )}
+
+                          {/* NUMBER */}
+
+                          {item.numberValue && (
+                            <p>
+
+                              <b className="text-white">
+                                Number:
+                              </b>{" "}
+
+                              {
+                                item.numberValue
+                              }
+
+                            </p>
+                          )}
+
+                          {/* LINK */}
+
+                          {item.link && (
+                            <div className="flex flex-wrap items-center gap-2">
+
+                              <b className="text-white">
+                                Link:
+                              </b>
+
+                              <a
+                                href={
+                                  item.link
+                                }
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 underline hover:text-blue-300 inline-flex items-center gap-1 max-w-full"
+                              >
+
+                                <span className="truncate max-w-[250px] sm:max-w-[450px]">
+                                  Open Link
+                                </span>
+
+                                <ExternalLink
+                                  size={14}
+                                />
+
+                              </a>
+
+                            </div>
+                          )}
+
+                          {/* CREATED */}
+
+                          {item.createdAt && (
+                            <p className="text-xs text-zinc-500 pt-1">
+
+                              Created:{" "}
+
+                              {new Date(
+                                item.createdAt
+                              ).toLocaleString()}
+
+                            </p>
+                          )}
+
+                          {/* IMAGE */}
+
+                          {item.image ? (
+
+                            <div className="pt-3">
+
+                              <p className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
+
+                                <ImageIcon
+                                  size={15}
+                                />
+
+                                Image
+
+                              </p>
+
+                              <div className="relative w-full max-w-sm h-44 sm:h-52 rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800">
+
+                                <img
+                                  src={getImageSrc(
+                                    item.image
+                                  )}
+                                  alt={
+                                    item.title ||
+                                    "Content image"
+                                  }
+                                  className="w-full h-full object-cover hover:scale-105 transition duration-300"
+                                  onError={(e) => {
+
+                                    e.currentTarget.style.display =
+                                      "none";
+
+                                    const parent =
+                                      e.currentTarget
+                                        .parentElement;
+
+                                    if (parent) {
+
+                                      const message =
+                                        document.createElement(
+                                          "div"
+                                        );
+
+                                      message.className =
+                                        "absolute inset-0 flex flex-col items-center justify-center text-center px-4 text-zinc-500";
+
+                                      message.innerHTML = `
+                                        <div style="font-size: 28px; margin-bottom: 8px;">
+                                          🖼️
+                                        </div>
+
+                                        <div style="font-weight: 600; color: #a1a1aa;">
+                                          Image unavailable
+                                        </div>
+
+                                        <div style="font-size: 12px; margin-top: 4px;">
+                                          Check image URL/path
+                                        </div>
+                                      `;
+
+                                      parent.appendChild(
+                                        message
+                                      );
+                                    }
+                                  }}
+                                />
+
+                              </div>
+
+                            </div>
+
+                          ) : (
+
+                            item.section !==
+                              "stats" && (
+                              <div className="w-full max-w-sm h-40 rounded-xl bg-zinc-100 border flex flex-col items-center justify-center text-zinc-500 mt-3 font-medium">
+
+                                <ImageIcon
+                                  size={28}
+                                  className="mb-2 opacity-50"
+                                />
+
+                                No Image
+
+                              </div>
+                            )
+
+                          )}
+
                         </div>
 
-                        <p className="break-words">
-                          <b className="text-white">
-                            Title:
-                          </b>{" "}
-                          {item.title}
-                        </p>
+                        {/* ACTIONS */}
 
-                        {item.subtitle && (
-                          <p className="break-words">
-                            <b className="text-white">
-                              Subtitle:
-                            </b>{" "}
-                            {item.subtitle}
-                          </p>
-                        )}
+                        <div className="flex flex-row xl:flex-col gap-2.5 xl:min-w-[120px] xl:self-start">
 
-                        {item.numberValue && (
-                          <p>
-                            <b className="text-white">
-                              Number:
-                            </b>{" "}
-                            {item.numberValue}
-                          </p>
-                        )}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              editItem(
+                                item
+                              )
+                            }
+                            className="flex-1 xl:flex-none bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2.5 rounded-xl font-semibold transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
+                          >
 
-                        {item.link && (
-                          <div className="flex flex-wrap items-center gap-2">
-                            <b className="text-white">
-                              Link:
-                            </b>
+                            <Pencil size={16} />
 
-                            <a
-                              href={item.link}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-400 underline hover:text-blue-300 inline-flex items-center gap-1 max-w-full"
-                            >
-                              <span className="truncate max-w-[250px] sm:max-w-[450px]">
-                                Open Link
-                              </span>
+                            Edit
 
-                              <ExternalLink size={14} />
-                            </a>
-                          </div>
-                        )}
+                          </button>
 
-                        {/* IMAGE */}
-                        {item.image ? (
-                          <div className="pt-2">
-                            <p className="text-sm font-semibold text-white mb-2">
-                              Image:
-                            </p>
+                          <button
+                            type="button"
+                            onClick={() => {
 
-                            <div className="relative w-full max-w-xs sm:max-w-sm h-44 sm:h-48 rounded-xl overflow-hidden bg-zinc-950 border border-zinc-800">
-                              <Image
-                                src={
-                                  item.image.startsWith(
-                                    "http"
-                                  )
-                                    ? item.image
-                                    : encodeURI(
-                                        item.image.startsWith(
-                                          "/"
-                                        )
-                                          ? item.image
-                                          : `/${item.image}`
-                                      )
-                                }
-                                fill
-                                alt={item.title}
-                                className="rounded-xl object-cover hover:scale-105 transition duration-300"
-                                unoptimized
+                              setSelectedId(
+                                item._id
+                              );
+
+                              setDeleteModal(
+                                true
+                              );
+
+                            }}
+                            disabled={
+                              deletingId ===
+                              item._id
+                            }
+                            className="flex-1 xl:flex-none bg-red-600 hover:bg-red-700 disabled:bg-red-900 disabled:cursor-not-allowed text-white px-4 py-2.5 rounded-xl transition duration-300 cursor-pointer flex items-center justify-center gap-2"
+                          >
+
+                            {deletingId ===
+                            item._id ? (
+                              <Loader2
+                                className="animate-spin"
+                                size={16}
                               />
-                            </div>
-                          </div>
-                        ) : (
-                          item.section !== "stats" && (
-                            <div className="w-full max-w-xs h-40 rounded-xl bg-zinc-100 border flex items-center justify-center text-zinc-500 mt-3 font-medium">
-                              No Image
-                            </div>
-                          )
-                        )}
+                            ) : (
+                              <Trash2
+                                size={16}
+                              />
+                            )}
+
+                            {deletingId ===
+                            item._id
+                              ? "Deleting..."
+                              : "Delete"}
+
+                          </button>
+
+                        </div>
+
                       </div>
 
-                      {/* ACTION BUTTONS */}
-                      <div className="flex flex-row xl:flex-col gap-2.5 xl:min-w-[110px]">
-                        <button
-                          onClick={() => editItem(item)}
-                          className="flex-1 xl:flex-none bg-yellow-500 hover:bg-yellow-600 text-black px-4 py-2.5 rounded-xl font-semibold transition-colors cursor-pointer shadow-md flex items-center justify-center gap-2"
-                        >
-                          <Pencil size={16} />
-                          Edit
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setSelectedId(item._id);
-                            setDeleteModal(true);
-                          }}
-                          disabled={deletingId === item._id}
-                          className="flex-1 xl:flex-none bg-red-600 hover:bg-red-700 disabled:bg-red-900 text-white px-4 py-2.5 rounded-xl transition duration-300 cursor-pointer flex items-center justify-center gap-2"
-                        >
-                          {deletingId === item._id ? (
-                            <Loader2
-                              className="animate-spin"
-                              size={16}
-                            />
-                          ) : (
-                            <Trash2 size={16} />
-                          )}
-
-                          {deletingId === item._id
-                            ? "Deleting..."
-                            : "Delete"}
-                        </button>
-                      </div>
                     </div>
-                  </div>
-                ))}
+
+                  )
+                )}
+
               </div>
+
             )}
+
           </div>
+
         </main>
 
-        {/* ================= DELETE MODAL ================= */}
+        {/* =================================================
+            DELETE MODAL
+        ================================================= */}
+
         {deleteModal && (
-          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4">
+          <div
+            className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4"
+            onMouseDown={(e) => {
+
+              if (
+                e.target ===
+                e.currentTarget
+              ) {
+                closeDeleteModal();
+              }
+
+            }}
+          >
+
             <div className="bg-white rounded-2xl p-5 sm:p-8 w-full max-w-[420px] shadow-2xl">
+
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
+
                 <Trash2
                   className="text-red-600"
                   size={22}
                 />
+
               </div>
 
               <h2 className="text-xl sm:text-2xl font-bold text-zinc-900 mb-3">
@@ -1228,41 +1961,63 @@ export default function AdminPage() {
               </h2>
 
               <p className="text-sm sm:text-base text-zinc-600">
-                Are you sure you want to permanently delete
-                this content? This action cannot be undone.
+                Are you sure you want
+                to permanently delete
+                this content? This
+                action cannot be undone.
               </p>
 
               <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 mt-7">
+
                 <button
-                  onClick={() => {
-                    setDeleteModal(false);
-                    setSelectedId(null);
-                  }}
-                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-zinc-200 hover:bg-zinc-300 text-zinc-800 cursor-pointer font-medium"
+                  type="button"
+                  onClick={
+                    closeDeleteModal
+                  }
+                  disabled={
+                    !!deletingId
+                  }
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-zinc-200 hover:bg-zinc-300 disabled:opacity-50 text-zinc-800 cursor-pointer font-medium"
                 >
                   Cancel
                 </button>
 
                 <button
-                  onClick={() => deleteItem(selectedId)}
-                  disabled={!!deletingId}
-                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white cursor-pointer font-medium flex items-center justify-center gap-2"
+                  type="button"
+                  onClick={() =>
+                    deleteItem(
+                      selectedId
+                    )
+                  }
+                  disabled={
+                    !!deletingId ||
+                    !selectedId
+                  }
+                  className="w-full sm:w-auto px-6 py-3 rounded-lg bg-red-600 hover:bg-red-700 disabled:bg-red-400 disabled:cursor-not-allowed text-white cursor-pointer font-medium flex items-center justify-center gap-2"
                 >
-                  {deletingId && (
+
+                  {deletingId ? (
                     <Loader2
                       className="animate-spin"
                       size={16}
                     />
+                  ) : (
+                    <Trash2 size={16} />
                   )}
 
                   {deletingId
                     ? "Deleting..."
                     : "Delete Permanently"}
+
                 </button>
+
               </div>
+
             </div>
+
           </div>
         )}
+
       </div>
     </>
   );
