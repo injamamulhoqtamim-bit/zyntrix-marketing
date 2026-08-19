@@ -3,9 +3,12 @@ import { NextResponse } from "next/server";
 export function proxy(request) {
   const { pathname } = request.nextUrl;
 
-  // Only protect admin routes
-  if (pathname.startsWith("/admin")) {
-    // Login page must remain public
+  /*
+   * Protect only actual admin routes.
+   * /admin/login must remain public.
+   */
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    // Allow login page
     if (pathname === "/admin/login") {
       return NextResponse.next();
     }
