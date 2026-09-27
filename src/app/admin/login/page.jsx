@@ -10,6 +10,7 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function AdminLogin() {
@@ -63,47 +64,62 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center px-4 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[120px]" />
+    <div className="min-h-screen bg-zinc-950 text-white flex items-center justify-center px-4 relative overflow-hidden selection:bg-blue-500 selection:text-white">
+      {/* Background ambient lighting */}
+      <div className="absolute w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[140px] -top-20 -left-20 pointer-events-none" />
+      <div className="absolute w-[400px] h-[400px] bg-indigo-600/10 rounded-full blur-[140px] -bottom-20 -right-20 pointer-events-none" />
 
-      <div className="max-w-md w-full bg-zinc-900/80 border border-zinc-800 p-8 rounded-3xl shadow-2xl backdrop-blur-xl relative z-10">
-        {/* Header */}
+      <div className="max-w-md w-full bg-zinc-900/60 border border-zinc-800/80 p-8 sm:p-10 rounded-[2.5rem] shadow-2xl backdrop-blur-2xl relative z-10 transition-all duration-300 hover:border-zinc-700/80">
+        
+        {/* Header with Admin Avatar/Image Container */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600/10 border border-blue-500/30 rounded-2xl text-blue-400 mb-4">
-            <Lock size={28} />
+          <div className="relative inline-block mb-4">
+            {/* Outer Glow Ring */}
+            <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-xl animate-pulse" />
+            
+            {/* Avatar Container */}
+            <div className="relative w-20 h-20 bg-gradient-to-tr from-blue-600/20 to-indigo-600/30 border border-blue-500/40 rounded-full flex items-center justify-center text-blue-400 shadow-inner overflow-hidden group">
+              {/* You can replace this with an actual <Image> or <img> if you have an admin photo */}
+              <div className="absolute inset-0 bg-zinc-900/40 backdrop-blur-xs flex items-center justify-center">
+                <User size={34} className="text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+              </div>
+            </div>
+
+            {/* Security Badge Indicator */}
+            <div className="absolute bottom-0 right-0 bg-blue-600 text-white p-1.5 rounded-full border-2 border-zinc-950 shadow-md">
+              <ShieldCheck size={12} />
+            </div>
           </div>
 
-          <h1 className="text-2xl font-black">
+          <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent">
             Admin Restricted Area
           </h1>
 
-          <p className="text-zinc-400 text-sm mt-2">
-            Authorized personnel only.
+          <p className="text-zinc-400 text-sm mt-2 font-medium">
+            Authorized personnel only. Secure gateway.
           </p>
         </div>
 
-        {/* Error */}
+        {/* Error Alert */}
         {error && (
-          <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 flex items-center gap-2">
-            <ShieldAlert size={18} className="shrink-0" />
-
-            <span>{error}</span>
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/30 rounded-2xl text-red-400 flex items-center gap-3 text-sm animate-shake">
+            <ShieldAlert size={18} className="shrink-0 text-red-400" />
+            <span className="font-medium">{error}</span>
           </div>
         )}
 
-        {/* Login form */}
-        <form onSubmit={handleLogin} className="space-y-4">
-          {/* Username */}
+        {/* Login Form */}
+        <form onSubmit={handleLogin} className="space-y-5">
+          {/* Username Field */}
           <div>
-            <label className="block mb-2 text-sm font-medium">
+            <label className="block mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Username
             </label>
 
-            <div className="relative">
+            <div className="relative group">
               <User
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-blue-400 transition-colors"
               />
 
               <input
@@ -113,28 +129,26 @@ export default function AdminLogin() {
                   setUsername(e.target.value);
                   setError("");
                 }}
-                placeholder="Enter username"
+                placeholder="Enter admin username"
                 autoComplete="username"
-                className="w-full bg-zinc-950 border border-zinc-700 rounded-xl py-3 pl-11 pr-4 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-zinc-950/80 border border-zinc-800 rounded-2xl py-3.5 pl-12 pr-4 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
                 required
               />
             </div>
           </div>
 
-          {/* Password */}
+          {/* Password Field */}
           <div>
-            <label className="block mb-2 text-sm font-medium">
+            <label className="block mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-400">
               Password
             </label>
 
-            <div className="relative">
-              {/* Lock icon */}
+            <div className="relative group">
               <Lock
                 size={18}
-                className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 group-focus-within:text-blue-400 transition-colors"
               />
 
-              {/* Password input */}
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
@@ -142,58 +156,40 @@ export default function AdminLogin() {
                   setPassword(e.target.value);
                   setError("");
                 }}
-                placeholder="Enter password"
+                placeholder="Enter secure password"
                 autoComplete="current-password"
-                className="w-full bg-zinc-950 border border-zinc-700 rounded-xl py-3 pl-11 pr-12 outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                className="w-full bg-zinc-950/80 border border-zinc-800 rounded-2xl py-3.5 pl-12 pr-12 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner"
                 required
               />
 
-              {/* Show / Hide password button */}
+              {/* Show / Hide Password Toggle */}
               <button
                 type="button"
-                onClick={() =>
-                  setShowPassword((prev) => !prev)
-                }
-                aria-label={
-                  showPassword
-                    ? "Hide password"
-                    : "Show password"
-                }
-                title={
-                  showPassword
-                    ? "Hide password"
-                    : "Show password"
-                }
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-blue-400 transition-colors p-1 rounded-lg focus:outline-none focus:ring-1 focus:ring-blue-500"
+                onClick={() => setShowPassword((prev) => !prev)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                title={showPassword ? "Hide password" : "Show password"}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-blue-400 transition-colors p-1.5 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
-                {showPassword ? (
-                  <EyeOff size={19} />
-                ) : (
-                  <Eye size={19} />
-                )}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
             </div>
           </div>
 
-          {/* Login */}
+          {/* Submit Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:bg-blue-900 disabled:cursor-not-allowed transition font-bold flex items-center justify-center gap-2"
+            className="w-full mt-2 py-3.5 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none transition-all font-semibold text-sm shadow-lg shadow-blue-600/25 flex items-center justify-center gap-2 group cursor-pointer"
           >
             {loading ? (
               <>
-                <Loader2
-                  size={18}
-                  className="animate-spin"
-                />
-
-                Verifying...
+                <Loader2 size={18} className="animate-spin" />
+                <span>Verifying credentials...</span>
               </>
             ) : (
               <>
-                Login
-                <ArrowRight size={18} />
+                <span>Access Dashboard</span>
+                <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </>
             )}
           </button>
